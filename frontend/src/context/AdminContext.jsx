@@ -1,0 +1,235 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+
+const AdminContext = createContext();
+
+export const useAdmin = () => useContext(AdminContext);
+
+const API_URL = 'http://localhost:5000/api';
+
+export const AdminProvider = ({ children }) => {
+    const [stats, setStats] = useState({
+        users: 0,
+        workersPending: 0,
+        verifiedWorkers: 0,
+        bookings: 0,
+        earnings: 0,
+        activeServices: 0,
+        availableCities: 0,
+        completedBookings: 0,
+        bookingsToday: 0,
+        bookingsMonth: 0,
+        wallet: { totalIn: 0, totalOut: 0, available: 0 },
+        reviews: { average: 0, total: 0, week: 0 }
+    });
+
+    const [categories, setCategories] = useState([]);
+    const [subCategories, setSubCategories] = useState([]);
+    const [cities, setCities] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const getAuthHeader = () => {
+        const token = localStorage.getItem('token');
+        return { headers: { Authorization: `Bearer ${token}` } };
+    };
+
+    const fetchStats = async () => {
+        try {
+            const { data } = await axios.get(`${API_URL}/admin/stats`, getAuthHeader());
+            setStats(prev => ({ ...prev, ...data }));
+        } catch (err) {
+            console.error("Error fetching stats:", err);
+        }
+    };
+
+    const fetchInitialData = async () => {
+        setLoading(true);
+        try {
+            const [catRes, cityRes] = await Promise.all([
+                axios.get(`${API_URL}/categories`, getAuthHeader()),
+                axios.get(`${API_URL}/cities`, getAuthHeader()),
+            ]);
+
+            setCategories(catRes.data);
+            const allSubCategories = catRes.data.flatMap(cat =>
+                cat.subCategories.map(sub => ({ ...sub, parentId: cat._id, parentName: cat.name }))
+            );
+            setSubCategories(allSubCategories);
+            setCities(cityRes.data);
+
+            setStats(prev => ({
+                ...prev,
+                activeServices: catRes.data.length,
+                availableCities: cityRes.data.length
+            }));
+
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching data:", err);
+            setError("Failed to fetch initial dashboard data.");
+            toast.error("Failed to load dashboard data");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchStats();
+        fetchInitialData();
+    }, []);
+
+    // Category Actions
+    const addCategory = async (formData) => {
+        try {
+            await axios.post(`${API_URL}/categories`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Category added successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to add category");
+            return false;
+        }
+    };
+
+    const updateCategory = async (id, formData) => {
+        try {
+            await axios.put(`${API_URL}/categories/${id}`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Category updated successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to update category");
+            return false;
+        }
+    };
+
+    const deleteCategory = async (id) => {
+        if (!window.confirm("Are you sure? This will delete all sub-categories within it.")) return;
+        try {
+            await axios.delete(`${API_URL}/categories/${id}`, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Category deleted successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to delete category");
+            return false;
+        }
+    };
+
+    // SubCategory Actions
+    const addSubCategory = async (parentId, formData) => {
+        try {
+            await axios.post(`${API_URL}/categories/${parentId}/subcategories`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Sub-category added successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to add sub-category");
+            return false;
+        }
+    };
+
+    const updateSubCategory = async (parentId, subId, formData) => {
+        try {
+            await axios.put(`${API_URL}/categories/${parentId}/subcategories/${subId}`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Sub-category updated successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to update sub-category");
+            return false;
+        }
+    };
+
+    const deleteSubCategory = async (parentId, subId) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await axios.delete(`${API_URL}/categories/${parentId}/subcategories/${subId}`, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Sub-category deleted successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to delete sub-category");
+            return false;
+        }
+    };
+    // Service Actions
+    const addService = async (formData) => {
+        try {
+            await axios.post(`${API_URL}/services`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData(); // Or fetch services separately
+            toast.success("Service added successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to add service");
+            return false;
+        }
+    };
+
+    const updateService = async (id, formData) => {
+        try {
+            await axios.put(`${API_URL}/services/${id}`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Service updated successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to update service");
+            return false;
+        }
+    };
+
+    const deleteService = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await axios.delete(`${API_URL}/services/${id}`, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Service deleted successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to delete service");
+            return false;
+        }
+    };
+
+
+
+    const value = {
+        stats,
+        categories,
+        subCategories,
+        cities,
+        loading,
+        error,
+        fetchStats,
+        fetchInitialData,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+        addSubCategory,
+        updateSubCategory,
+        deleteSubCategory,
+        addService,
+        updateService,
+        deleteService
+    };
+
+    return (
+        <AdminContext.Provider value={value}>
+            {children}
+        </AdminContext.Provider>
+    );
+};

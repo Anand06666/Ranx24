@@ -1,0 +1,13 @@
+node_modules/
+.env
+.DS_Store
+.idea/
+.vscode/
+*.log
+dist/
+build/
+coverage/
+
+# Mobile apps (ignored as per user request)
+app/
+worker-app/
