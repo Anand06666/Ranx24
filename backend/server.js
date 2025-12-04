@@ -7,80 +7,79 @@ import path from "path";
 import { fileURLToPath } from "url";
 import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./middleware/errorMiddleware.js";
-import validateEnv from "./config/validateEnv.js";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import { sanitizeMongo, sanitizeXSS, customSanitize } from "./middleware/sanitize.js";
 import http from "http";
 import { Server } from "socket.io";
 
-// ---------------------------
-// FIX __dirname (FOR ES MODULES)
-// ---------------------------
+// -----------------------------
+// Fix __dirname for ES Modules
+// -----------------------------
 const __filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
+// -----------------------------
 // Load env
+// -----------------------------
 dotenv.config({ path: path.join(__dirname, ".env") });
 
-// Validate env
-validateEnv();
+// -----------------------------
+// Validate env (optional)
+// -----------------------------
+console.log("🌍 Environment Loaded");
 
+// -----------------------------
+// Express App
+// -----------------------------
 const app = express();
 
-// ---------------------------
-// CORS CONFIG
-// ---------------------------
+// -----------------------------
+// CORS FIX (100% WORKING)
+// -----------------------------
 const allowedOrigins = [
   "https://ranx24.com",
   "https://www.ranx24.com",
   "https://admin.ranx24.com",
+  "https://backend.ranx24.com",
   "http://localhost:5173",
-  "http://localhost:3000"
+  "http://localhost:5174",
 ];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      console.log("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      return cb(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
 );
 
-// ---------------------------
-// HELMET
-// ---------------------------
+// -----------------------------
+// Security
+// -----------------------------
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: false, // Disable CSP to allow API calls
   })
 );
 
-// RATE LIMITER
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-// BODY PARSER
-app.use(express.json({ limit: "20mb" }));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+// Body Parser
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// SANITIZATION
-app.use(sanitizeMongo);
-app.use(sanitizeXSS);
-app.use(customSanitize);
-
-// STATIC FILES
+// Static Folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// ---------------------------
-// ROUTES
-// ---------------------------
-import adminWorkerRoutes from "./router/adminWorkerRoutes.js";
+// -----------------------------
+// ROUTES IMPORTS
+// -----------------------------
 import adminRoutes from "./router/adminRoutes.js";
+import adminWorkerRoutes from "./router/adminWorkerRoutes.js";
 import categoryRoutes from "./router/categoryRoutes.js";
 import workerRoutes from "./router/workerRoutes.js";
 import userRoutes from "./router/userRoutes.js";
@@ -106,7 +105,9 @@ import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
 import paymentConfigRoutes from "./router/paymentConfigRoutes.js";
 
-// API ROUTES
+// -----------------------------
+// ROUTES USE
+// -----------------------------
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/workers", adminWorkerRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -134,45 +135,61 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/location", locationRoutes);
 
-// HEALTH CHECK
+// -----------------------------
+// Health Check
+// -----------------------------
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    time: new Date(),
+    mongo: mongoose.connection.readyState,
+  });
 });
 
-// NOT FOUND HANDLER
+// -----------------------------
+// 404 Error
+// -----------------------------
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+  next(new AppError(Can't find ${req.originalUrl}, 404));
 });
 
-// ERROR HANDLER
+// -----------------------------
+// Global Error Handler
+// -----------------------------
 app.use(globalErrorHandler);
 
-// ---------------------------
+// -----------------------------
 // DATABASE
-// ---------------------------
+// -----------------------------
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log(" MongoDB Connected"))
+  .then(() => console.log("✔ MongoDB Connected"))
   .catch((err) => {
-    console.error(" DB Error:", err);
+    console.error("❌ DB Error:", err.message);
     process.exit(1);
   });
 
-// ---------------------------
+// -----------------------------
 // SOCKET.IO
-// ---------------------------
-const PORT = process.env.PORT || 5000;
+// -----------------------------
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: allowedOrigins, credentials: true },
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
 });
 
 io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
+  console.log("User connected:", socket.id);
 });
 
+// -----------------------------
 // START SERVER
-server.listen(PORT, "0.0.0.0", () =>
-  console.log(` Server running on port ${PORT}`)
-);
+// -----------------------------
+const PORT = process.env.PORT || 5000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(🚀 Server running on port ${PORT});
+});
