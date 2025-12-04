@@ -40,11 +40,11 @@ const FRONTEND = process.env.CLIENT_URL || "https://ranx24.com";
 const ADMIN = process.env.ADMIN_URL || null;
 
 const allowedOrigins = [
-  FRONTEND,
-  ADMIN,
-  "http://localhost:5173",
-  "http://localhost:3000"
-].filter(Boolean);
+  "https://ranx24.com",
+  "https://www.ranx24.com",
+  "https://admin.ranx24.com",
+  "http://localhost:5173"
+];
 
 app.use(
   cors({
