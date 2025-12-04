@@ -8,62 +8,66 @@ import { fileURLToPath } from "url";
 import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./middleware/errorMiddleware.js";
 import validateEnv from "./config/validateEnv.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { sanitizeMongo, sanitizeXSS, customSanitize } from "./middleware/sanitize.js";
+import http from "http";
+import { Server } from "socket.io";
 
 // ES Module dirname fix
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load env variables
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+// Load .env
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
-// Validate environment variables before starting server
+// Validate environment variables
 try {
   validateEnv();
 } catch (error) {
-  console.error('Environment validation failed:', error.message);
+  console.error("Environment validation failed:", error.message);
   process.exit(1);
 }
 
 const app = express();
 
-// Security Middleware
-import helmet from "helmet";
+// ---------------------------
+// 🚀 PRODUCTION ORIGINS FIXED
+// ---------------------------
+const FRONTEND = process.env.CLIENT_URL || "http://q8c8swkgsgcws40cw888gcww.72.61.233.226.sslip.io";
+const ADMIN = process.env.ADMIN_URL || null;
 
-// CORS Middleware - Must be before routes
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const allowedOrigins = [
+  FRONTEND,
+  ADMIN,
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:5174",
+  "http://localhost:19006"
+].filter(Boolean);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:5174",
-      "http://localhost:19006",
-      process.env.CLIENT_URL, // Allow production frontend
-      process.env.ADMIN_URL   // Allow production admin panel if separate
-    ].filter(Boolean); // Remove undefined values
+// ---------------------------
+// 🚀 GLOBAL CORS
+// ---------------------------
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-    // Allow requests with no origin (mobile apps, Postman, curl)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      // In development, allow unknown origins for testing
-      // In production, block unknown origins for security
-      if (isDevelopment) {
-        console.log("⚠️  Unknown origin allowed (development mode):", origin);
-        callback(null, true);
-      } else {
-        console.error("❌ Blocked unknown origin (production mode):", origin);
-        callback(new Error('Not allowed by CORS'));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
-    }
-  },
-  credentials: true
-}));
 
-// Helmet Secure Headers
+      console.error("❌ Blocked by CORS:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+
+// ---------------------------
+// 🚀 Helmet Security (CSP Fixed)
+// ---------------------------
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -73,48 +77,49 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: ["'self'", "data:", "blob:", "*"],
-        connectSrc: ["'self'", "ws:", "wss:", "*"],
+        connectSrc: [
+          "'self'",
+          "ws:",
+          "wss:",
+          FRONTEND,
+          ADMIN,
+          "*",
+        ],
       },
     },
   })
 );
 
-// Rate Limiting - Prevent API abuse
-import rateLimit from "express-rate-limit";
+// ---------------------------
+// 🚀 Rate Limiting
+// ---------------------------
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 15 * 60 * 1000,
+  max: 200,
 });
 app.use(limiter);
 
-// Stricter rate limiting for authentication endpoints
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
-  message: 'Too many authentication attempts, please try again later.',
-  skipSuccessfulRequests: true, // Don't count successful requests
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  skipSuccessfulRequests: true,
 });
 
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Body Parser
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Sanitization Middleware
-import {
-  sanitizeMongo,
-  sanitizeXSS,
-  customSanitize,
-} from "./middleware/sanitize.js";
+// Sanitization
 app.use(sanitizeMongo);
 app.use(sanitizeXSS);
 app.use(customSanitize);
 
-// 🚀 Static folder to serve Worker uploaded photos/profiles
+// Static Folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Routes Imports
+// ---------------------------
+// 🚀 ROUTES IMPORT
+// ---------------------------
 import adminWorkerRoutes from "./router/adminWorkerRoutes.js";
 import adminRoutes from "./router/adminRoutes.js";
 import categoryRoutes from "./router/categoryRoutes.js";
@@ -142,7 +147,9 @@ import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
 import paymentConfigRoutes from "./router/paymentConfigRoutes.js";
 
-// Use Routes
+// ---------------------------
+// 🚀 USE ROUTES
+// ---------------------------
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/workers", adminWorkerRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -153,10 +160,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/cities", cityRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/auth", authLimiter, authRoutes); // Apply stricter rate limiting to auth
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/wallet", userwalletRoutes);
 app.use("/api/worker-wallet", workerWalletRoutes);
-app.use("/api/payment/config", paymentConfigRoutes); // Payment config endpoint
+app.use("/api/payment/config", paymentConfigRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/reviews", reviewRoutes);
@@ -170,115 +177,78 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/location", locationRoutes);
 
-// Health Check Endpoint
+// Health Check
 app.get("/health", (req, res) => {
   res.json({
-    status: 'ok',
+    status: "ok",
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development',
-    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    environment: process.env.NODE_ENV || "development",
+    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
 
-// Test API
+// Base Route
 app.get("/", (req, res) => {
   res.send("Backend API is running successfully 🚀");
 });
 
-// Not Found Handler
-app.all(/(.*)/, (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+// Not Found
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
 // Global Error Handler
 app.use(globalErrorHandler);
 
-// Database Connect with connection pooling
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/RanX24";
-
+// ---------------------------
+// 🚀 DATABASE CONNECT
+// ---------------------------
 mongoose
-  .connect(MONGO_URI, {
+  .connect(process.env.MONGO_URI, {
     maxPoolSize: 10,
     minPoolSize: 5,
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
   })
-  .then(() => console.log("🟢 MongoDB connected successfully"))
+  .then(() => console.log("🟢 MongoDB connected"))
   .catch((err) => {
     console.error("❌ MongoDB connection error:", err);
     process.exit(1);
   });
 
-// Create Server + Socket.IO Support
-import { Server } from "socket.io";
-import http from "http";
-
+// ---------------------------
+// 🚀 SOCKET.IO SETUP
+// ---------------------------
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "http://localhost:5174",
-      "http://localhost:19006"
-    ],
-    credentials: true
+    origin: allowedOrigins,
+    credentials: true,
   },
 });
 
-// Socket middleware to access req.io
+// Middleware for socket access
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
+// Socket Events
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  socket.on("join_room", (userId) => {
-    if (userId) {
-      socket.join(userId);
-      console.log(`Socket ${socket.id} joined room ${userId}`);
-    }
-  });
-
-  // Handle join_notifications (used by worker app)
-  socket.on("join_notifications", (userId) => {
-    if (userId) {
-      socket.join(userId);
-      console.log(`Socket ${socket.id} joined notifications for ${userId}`);
-    }
-  });
-
-  // Handle chat events
-  socket.on("join_chat", (chatId) => {
-    if (chatId) {
-      socket.join(chatId);
-      console.log(`Socket ${socket.id} joined chat ${chatId}`);
-    }
-  });
-
-  socket.on("leave_chat", (chatId) => {
-    if (chatId) {
-      socket.leave(chatId);
-      console.log(`Socket ${socket.id} left chat ${chatId}`);
-    }
-  });
+  socket.on("join_room", (userId) => userId && socket.join(userId));
+  socket.on("join_notifications", (userId) => userId && socket.join(userId));
+  socket.on("join_chat", (chatId) => chatId && socket.join(chatId));
+  socket.on("leave_chat", (chatId) => chatId && socket.leave(chatId));
 
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
 });
 
-console.log('Attempting to start server on port:', PORT);
+// Start Server
 server.listen(PORT, "0.0.0.0", () =>
   console.log(`🔥 Server running on port ${PORT}`)
 );
-
-server.on('error', (e) => {
-  console.error('Server Error:', e);
-});
