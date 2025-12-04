@@ -18,7 +18,7 @@ import { Server } from "socket.io";
 // FIX __dirname for ES Modules
 // ---------------------------
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const _dirname = path.dirname(_filename);
 
 // Load env
 dotenv.config({ path: path.resolve(__dirname, ".env") });
@@ -27,7 +27,7 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 try {
   validateEnv();
 } catch (err) {
-  console.error(" Env validation error:", err.message);
+  console.error("Env validation error:", err.message);
   process.exit(1);
 }
 
@@ -36,19 +36,22 @@ const app = express();
 // ---------------------------
 // CORS FIX
 // ---------------------------
-const FRONTEND = process.env.CLIENT_URL || "https://ranx24.com";
-const ADMIN = process.env.ADMIN_URL || null;
-
 const allowedOrigins = [
   "https://ranx24.com",
   "https://www.ranx24.com",
   "https://admin.ranx24.com",
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "http://localhost:3000"
 ];
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
@@ -64,7 +67,7 @@ app.use(
 );
 
 // Rate Limiting
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
 
 // Body Parser
 app.use(express.json({ limit: "20mb" }));
@@ -102,7 +105,7 @@ import addressRoutes from "./router/addressRoutes.js";
 import availabilityRoutes from "./router/availabilityRoutes.js";
 import notificationRoutes from "./router/notificationRoutes.js";
 import workerAnalyticsRoutes from "./router/workerAnalyticsRoutes.js";
-import workerSupportRoutes from "./router/workerSupportRoutes.js";
+import workerSupportRoutes from "./router/userwalletRoutes.js";
 import workerWalletRoutes from "./router/workerWalletRoutes.js";
 import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
@@ -137,16 +140,12 @@ app.use("/api/location", locationRoutes);
 
 // Health Check
 app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    time: new Date(),
-    mongo: mongoose.connection.readyState,
-  });
+  res.json({ status: "ok", time: new Date(), mongo: mongoose.connection.readyState });
 });
 
 // Not Found
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+  next(new AppError(Can't find ${req.originalUrl}, 404));
 });
 
 // Error Handler
@@ -157,9 +156,9 @@ app.use(globalErrorHandler);
 // ---------------------------
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log(" MongoDB Connected"))
+  .then(() => console.log("MongoDB Connected"))
   .catch((err) => {
-    console.error(" DB Error:", err);
+    console.error("DB Error:", err);
     process.exit(1);
   });
 
@@ -178,5 +177,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(`Server running on port ${PORT}`)
+  console.log(Server running on port ${PORT})
 );
