@@ -150,7 +150,7 @@ app.get("/health", (req, res) => {
 // 404 Error
 // -----------------------------
 app.all("*", (req, res, next) => {
-  next(new AppError(Can't find ${req.originalUrl}, 404));
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
 // -----------------------------
@@ -191,5 +191,5 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(🚀 Server running on port ${PORT});
+  console.log(` Server running on port ${PORT}`);
 });
