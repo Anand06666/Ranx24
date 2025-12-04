@@ -27,7 +27,7 @@ dotenv.config({ path: path.resolve(__dirname, ".env") });
 try {
   validateEnv();
 } catch (err) {
-  console.error("❌ Env validation error:", err.message);
+  console.error(" Env validation error:", err.message);
   process.exit(1);
 }
 
@@ -157,9 +157,9 @@ app.use(globalErrorHandler);
 // ---------------------------
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("🟢 MongoDB Connected"))
+  .then(() => console.log(" MongoDB Connected"))
   .catch((err) => {
-    console.error("❌ DB Error:", err);
+    console.error(" DB Error:", err);
     process.exit(1);
   });
 
@@ -178,5 +178,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(🔥 Server running on port ${PORT})
+  console.log( Server running on port ${PORT})
 );
