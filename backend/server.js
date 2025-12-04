@@ -18,7 +18,7 @@ import { Server } from "socket.io";
 // FIX __dirname for ES Modules
 // ---------------------------
 const __filename = fileURLToPath(import.meta.url);
-const _dirname = path.dirname(_filename);
+const __dirname = path.dirname(__filename);
 
 // Load env
 dotenv.config({ path: path.resolve(__dirname, ".env") });
