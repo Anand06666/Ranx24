@@ -146,7 +146,7 @@ app.get("/health", (req, res) => {
 
 // Not Found
 app.all("*", (req, res, next) => {
-  next(new AppError(Can't find ${req.originalUrl}, 404));
+  next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
 // Error Handler
