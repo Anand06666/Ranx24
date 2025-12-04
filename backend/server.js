@@ -43,6 +43,8 @@ app.use(cors({
       "http://localhost:3000",
       "http://localhost:5174",
       "http://localhost:19006",
+      "https://www.ranx24.com",
+      "https://ranx24.com",
       process.env.CLIENT_URL, // Allow production frontend
       process.env.ADMIN_URL   // Allow production admin panel if separate
     ].filter(Boolean); // Remove undefined values
@@ -228,7 +230,10 @@ const io = new Server(server, {
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:5174",
-      "http://localhost:19006"
+      "http://localhost:5174",
+      "http://localhost:19006",
+      "https://www.ranx24.com",
+      "https://ranx24.com"
     ],
     credentials: true
   },

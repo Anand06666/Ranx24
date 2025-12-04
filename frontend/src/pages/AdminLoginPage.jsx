@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const AdminLoginPage = () => {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -10,24 +11,14 @@ const AdminLoginPage = () => {
 
   const handleAdminLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ mobileNumber, password }),
-      });
+      const { data } = await api.post('/admin/login', { mobileNumber, password });
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data) {
         login(data.user, data.token);
         // localStorage.setItem('userType', 'admin'); // login function handles this if role is present
 
         alert(data.message);
         navigate('/admin-dashboard'); // Navigate to admin dashboard on successful login
-      } else {
-        alert(data.message || 'Admin login failed');
       }
     } catch (error) {
       console.error('Error during admin login:', error);

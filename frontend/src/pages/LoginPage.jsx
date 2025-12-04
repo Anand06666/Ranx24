@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API_URL}/auth/login`, {
+      const { data } = await api.post('/auth/login', {
         identifier,
         password,
         userType: 'user',

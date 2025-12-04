@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function SignupPage() {
         }
 
         try {
-            const { data } = await axios.post(`${API_URL}/auth/register`, {
+            const { data } = await api.post('/auth/register', {
                 name: formData.name,
                 phone: formData.phone,
                 email: formData.email,

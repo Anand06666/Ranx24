@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import toast from 'react-hot-toast'; // Import toast for notifications
 
-const API_URL = 'http://localhost:5000/api'; // Base API URL
+// const API_URL = 'http://localhost:5000/api'; // Base API URL
 
 export default function WorkerLoginPage() {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -23,7 +23,7 @@ export default function WorkerLoginPage() {
     setLoading(true); // Set loading true
     try {
       // Call the backend's login endpoint
-      const { data } = await axios.post(`${API_URL}/auth/login`, {
+      const { data } = await api.post('/auth/login', {
         identifier: mobileNumber,
         password,
         userType: 'worker'
