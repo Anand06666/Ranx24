@@ -15,26 +15,21 @@ import http from "http";
 import { Server } from "socket.io";
 
 // ---------------------------
-// FIX __dirname
+// FIX __dirname (FOR ES MODULES)
 // ---------------------------
 const __filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
 // Load env
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Validate env
-try {
-  validateEnv();
-} catch (err) {
-  console.error("❌ Env validation error:", err.message);
-  process.exit(1);
-}
+validateEnv();
 
 const app = express();
 
 // ---------------------------
-// CORS FIX
+// CORS CONFIG
 // ---------------------------
 const allowedOrigins = [
   "https://ranx24.com",
@@ -47,17 +42,18 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      console.log("❌ Blocked Origin:", origin);
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      console.log("❌ Blocked by CORS:", origin);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
 );
 
-// Helmet
+// ---------------------------
+// HELMET
+// ---------------------------
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -65,19 +61,19 @@ app.use(
   })
 );
 
-// Rate Limit
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 500 }));
+// RATE LIMITER
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-// Body Parser
+// BODY PARSER
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// Sanitization
+// SANITIZATION
 app.use(sanitizeMongo);
 app.use(sanitizeXSS);
 app.use(customSanitize);
 
-// Static
+// STATIC FILES
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ---------------------------
@@ -110,6 +106,7 @@ import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
 import paymentConfigRoutes from "./router/paymentConfigRoutes.js";
 
+// API ROUTES
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/workers", adminWorkerRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -137,25 +134,17 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/location", locationRoutes);
 
-// ---------------------------
-// Health
-// ---------------------------
+// HEALTH CHECK
 app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    timestamp: Date.now(),
-    mongo: mongoose.connection.readyState,
-  });
+  res.json({ status: "ok" });
 });
 
-// ---------------------------
-// NOT FOUND FIX
-// ---------------------------
+// NOT FOUND HANDLER
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl}`, 404));
 });
 
-// Error Handler
+// ERROR HANDLER
 app.use(globalErrorHandler);
 
 // ---------------------------
@@ -163,9 +152,9 @@ app.use(globalErrorHandler);
 // ---------------------------
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("🟢 MongoDB Connected"))
+  .then(() => console.log(" MongoDB Connected"))
   .catch((err) => {
-    console.error("❌ DB Error:", err);
+    console.error(" DB Error:", err);
     process.exit(1);
   });
 
@@ -183,9 +172,7 @@ io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 });
 
-// ---------------------------
 // START SERVER
-// ---------------------------
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(🚀 Server running on port ${PORT})
+  console.log(` Server running on port ${PORT}`)
 );
