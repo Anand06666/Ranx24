@@ -1,95 +1,67 @@
-import { io } from 'socket.io-client';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import io from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:5000';
+const SocketContext = createContext();
 
-class SocketService {
-    constructor() {
-        this.socket = null;
-        this.connected = false;
-    }
+export const useSocket = () => {
+    return useContext(SocketContext);
+};
 
-    connect(token) {
-        if (this.socket) return;
+import { useAuth } from './AuthContext';
 
-        this.socket = io(SOCKET_URL, {
-            auth: { token },
-            transports: ['websocket'],
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionAttempts: 5,
-        });
+export const SocketProvider = ({ children }) => {
+    const [socket, setSocket] = useState(null);
+    const { user, token } = useAuth();
 
-        this.socket.on('connect', () => {
-            console.log('✅ Socket connected:', this.socket.id);
-            this.connected = true;
-        });
+    useEffect(() => {
+        if (user && token) {
+            const serverUrl = import.meta.env.VITE_SERVER_URL || 'https://www.ranx24.com';
+            console.log(`[Socket] Attempting to connect to ${serverUrl}`);
+            const newSocket = io(serverUrl, {
+                auth: { token },
+                transports: ['websocket'],
+                withCredentials: true,
+            });
 
-        this.socket.on('disconnect', () => {
-            console.log('❌ Socket disconnected');
-            this.connected = false;
-        });
+            newSocket.on('connect', () => {
+                console.log(`[Socket] Connected with ID: ${newSocket.id}`);
+                if (user._id) {
+                    console.log(`[Socket] Emitting 'join_room' for user ID: ${user._id}`);
+                    newSocket.emit('join_room', user._id);
+                }
+                const userType = localStorage.getItem('userType');
+                if (user.role === 'admin' || userType === 'admin') {
+                    console.log("[Socket] Emitting 'join_room' for 'admin' room.");
+                    newSocket.emit('join_room', 'admin');
+                }
+            });
 
-        this.socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-        });
-    }
+            newSocket.on('connect_error', (err) => {
+                console.error(`[Socket] Connection Error: ${err.message}`);
+            });
 
-    disconnect() {
-        if (this.socket) {
-            this.socket.disconnect();
-            this.socket = null;
-            this.connected = false;
+            newSocket.on('disconnect', (reason) => {
+                console.log(`[Socket] Disconnected: ${reason}`);
+            });
+
+            setSocket(newSocket);
+
+            return () => {
+                console.log('[Socket] Disconnecting socket due to cleanup or unmount.');
+                newSocket.disconnect();
+            };
+        } else {
+            if (socket) {
+                console.log('[Socket] Disconnecting existing socket due to missing user/token.');
+                socket.disconnect();
+                setSocket(null);
+            }
         }
-    }
+    }, [user, token]);
 
-    joinChat(chatId) {
-        if (this.socket && this.connected) {
-            this.socket.emit('join_chat', chatId);
-            console.log('Joined chat:', chatId);
-        }
-    }
-
-    leaveChat(chatId) {
-        if (this.socket && this.connected) {
-            this.socket.emit('leave_chat', chatId);
-        }
-    }
-
-    sendMessage(chatId, message) {
-        if (this.socket && this.connected) {
-            this.socket.emit('send_message', { chatId, message });
-        }
-    }
-
-    onNewMessage(callback) {
-        if (this.socket) {
-            this.socket.on('new_message', callback);
-        }
-    }
-
-    onTyping(callback) {
-        if (this.socket) {
-            this.socket.on('user_typing', callback);
-        }
-    }
-
-    sendTyping(chatId, isTyping) {
-        if (this.socket && this.connected) {
-            this.socket.emit('typing', { chatId, isTyping });
-        }
-    }
-
-    removeListener(event) {
-        if (this.socket) {
-            this.socket.off(event);
-        }
-    }
-
-    removeAllListeners() {
-        if (this.socket) {
-            this.socket.removeAllListeners();
-        }
-    }
-}
-
-export default new SocketService();
+    return (
+        <SocketContext.Provider value={socket}>
+            {children}
+        </SocketContext.Provider>
+    );
+};
