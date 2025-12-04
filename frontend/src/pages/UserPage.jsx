@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useLocation } from '../context/LocationContext';
 import { LucideSearch, LucideMapPin, LucideShieldCheck, LucideClock, LucideStar, LucideArrowRight, LucideX, LucideChevronDown } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://www.ranx24.com';
 
 const UserPage = () => {
   const [categories, setCategories] = useState([]);
