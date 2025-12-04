@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -7,79 +6,80 @@ import path from "path";
 import { fileURLToPath } from "url";
 import AppError from "./utils/AppError.js";
 import globalErrorHandler from "./middleware/errorMiddleware.js";
+import validateEnv from "./config/validateEnv.js";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import { sanitizeMongo, sanitizeXSS, customSanitize } from "./middleware/sanitize.js";
 import http from "http";
 import { Server } from "socket.io";
 
-// -----------------------------
-// Fix __dirname for ES Modules
-// -----------------------------
+// ----------- FIX __dirname for ESModule -----------
 const __filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
-// -----------------------------
-// Load env
-// -----------------------------
+// ----------- Load Env -----------
 dotenv.config({ path: path.join(__dirname, ".env") });
 
-// -----------------------------
-// Validate env (optional)
-// -----------------------------
-console.log("🌍 Environment Loaded");
+// ----------- Validate Env -----------
+try {
+  validateEnv();
+  console.log("✅ ENV OK");
+} catch (err) {
+  console.error("❌ ENV ERROR:", err.message);
+  process.exit(1);
+}
 
-// -----------------------------
-// Express App
-// -----------------------------
 const app = express();
 
-// -----------------------------
-// CORS FIX (100% WORKING)
-// -----------------------------
+// ----------- CORS CONFIG -----------
 const allowedOrigins = [
   "https://ranx24.com",
   "https://www.ranx24.com",
   "https://admin.ranx24.com",
-  "https://backend.ranx24.com",
   "http://localhost:5173",
-  "http://localhost:5174",
+  "http://localhost:3000",
+  "http://localhost:5174"
 ];
 
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(new Error("Not allowed by CORS"));
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.log("❌ BLOCKED ORIGIN:", origin);
+      return callback(new Error("CORS BLOCKED"));
     },
     credentials: true,
   })
 );
 
-// -----------------------------
-// Security
-// -----------------------------
+// ----------- Security -----------
 app.use(
   helmet({
+    contentSecurityPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
-    contentSecurityPolicy: false, // Disable CSP to allow API calls
   })
 );
 
+// ----------- Rate Limit -----------
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
 
-// Body Parser
-app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+// ----------- Body Parser -----------
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
-// Static Folder
+// ----------- Sanitization -----------
+app.use(sanitizeMongo);
+app.use(sanitizeXSS);
+app.use(customSanitize);
+
+// ----------- Static Files -----------
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// -----------------------------
-// ROUTES IMPORTS
-// -----------------------------
-import adminRoutes from "./router/adminRoutes.js";
+// ----------- ROUTES IMPORT -----------
 import adminWorkerRoutes from "./router/adminWorkerRoutes.js";
+import adminRoutes from "./router/adminRoutes.js";
 import categoryRoutes from "./router/categoryRoutes.js";
 import workerRoutes from "./router/workerRoutes.js";
 import userRoutes from "./router/userRoutes.js";
@@ -105,9 +105,7 @@ import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
 import paymentConfigRoutes from "./router/paymentConfigRoutes.js";
 
-// -----------------------------
-// ROUTES USE
-// -----------------------------
+// ----------- USE ROUTES -----------
 app.use("/api/admin", adminRoutes);
 app.use("/api/admin/workers", adminWorkerRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -135,9 +133,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/location", locationRoutes);
 
-// -----------------------------
-// Health Check
-// -----------------------------
+// ----------- Health Check -----------
 app.get("/health", (req, res) => {
   res.json({
     status: "ok",
@@ -146,50 +142,36 @@ app.get("/health", (req, res) => {
   });
 });
 
-// -----------------------------
-// 404 Error
-// -----------------------------
+// ----------- NOT FOUND -----------
 app.all("*", (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl}`, 404));
+  next(new AppError(`Cannot find ${req.originalUrl}`, 404));
 });
 
-// -----------------------------
-// Global Error Handler
-// -----------------------------
+// ----------- ERROR HANDLER -----------
 app.use(globalErrorHandler);
 
-// -----------------------------
-// DATABASE
-// -----------------------------
+// ----------- DATABASE -----------
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✔ MongoDB Connected"))
+  .then(() => console.log("🟢 MongoDB Connected"))
   .catch((err) => {
-    console.error("❌ DB Error:", err.message);
+    console.error("❌ MongoDB Error:", err);
     process.exit(1);
   });
 
-// -----------------------------
-// SOCKET.IO
-// -----------------------------
+// ----------- SOCKET.io -----------
+const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    credentials: true,
-  },
+  cors: { origin: allowedOrigins, credentials: true },
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("Client connected:", socket.id);
 });
 
-// -----------------------------
-// START SERVER
-// -----------------------------
-const PORT = process.env.PORT || 5000;
-
+// ----------- START SERVER -----------
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(` Server running on port ${PORT}`);
+  console.log(`Server running on PORT ${PORT}`);
 });
