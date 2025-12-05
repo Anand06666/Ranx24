@@ -29,6 +29,7 @@ try {
 }
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (Nginx/Coolify)
 
 // Security Middleware
 import helmet from "helmet";
