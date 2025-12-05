@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         localStorage.removeItem('userType');
-        navigate('/otp-login');
+        navigate('/login');
     };
 
     const updateUser = (updatedUserData) => {
