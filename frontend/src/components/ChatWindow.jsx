@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useSocket } from '../context/SocketContext';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function ChatWindow({ bookingId, isOpen, onClose, userRole }) {
     const [chat, setChat] = useState(null);

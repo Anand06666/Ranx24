@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+
 export default function BannerManagement() {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ export default function BannerManagement() {
             endDate: banner.endDate ? banner.endDate.split('T')[0] : '',
             image: null
         });
-        setImagePreview(`http://localhost:5000/${banner.image}`);
+        setImagePreview(`${SERVER_URL}/${banner.image}`);
         setShowModal(true);
     };
 
@@ -196,8 +198,8 @@ export default function BannerManagement() {
                         key={platform.value}
                         onClick={() => setActivePlatform(platform.value)}
                         className={`px-6 py-3 rounded-lg font-semibold transition flex items-center gap-2 cursor-pointer ${activePlatform === platform.value
-                                ? `bg-${platform.color}-600 text-white shadow-lg`
-                                : `bg-white border-2 border-${platform.color}-200 text-${platform.color}-700 hover:border-${platform.color}-400`
+                            ? `bg-${platform.color}-600 text-white shadow-lg`
+                            : `bg-white border-2 border-${platform.color}-200 text-${platform.color}-700 hover:border-${platform.color}-400`
                             }`}
                     >
                         <i className={`fa-solid ${platform.icon}`}></i>
@@ -232,7 +234,7 @@ export default function BannerManagement() {
                                 <tr key={banner._id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4">
                                         <img
-                                            src={`http://localhost:5000/${banner.image}`}
+                                            src={`${SERVER_URL}/${banner.image}`}
                                             alt={banner.title}
                                             className="w-24 h-16 object-cover rounded"
                                         />
@@ -245,8 +247,8 @@ export default function BannerManagement() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${banner.type === 'slider' ? 'bg-blue-100 text-blue-800' :
-                                                banner.type === 'sponsor' ? 'bg-green-100 text-green-800' :
-                                                    'bg-purple-100 text-purple-800'
+                                            banner.type === 'sponsor' ? 'bg-green-100 text-green-800' :
+                                                'bg-purple-100 text-purple-800'
                                             }`}>
                                             {banner.type}
                                         </span>

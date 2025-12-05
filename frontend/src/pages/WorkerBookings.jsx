@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { FiCalendar, FiClock, FiMapPin, FiDollarSign, FiUser, FiTool, FiCheck, FiX, FiPlay, FiFlag } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function WorkerBookings() {
   const [bookings, setBookings] = useState([]);
@@ -89,10 +89,10 @@ export default function WorkerBookings() {
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        booking.status === 'accepted' ? 'bg-blue-100 text-blue-800' :
-                          booking.status === 'in-progress' ? 'bg-purple-100 text-purple-800' :
-                            booking.status === 'completed' ? 'bg-green-100 text-green-800' :
-                              'bg-red-100 text-red-800'
+                      booking.status === 'accepted' ? 'bg-blue-100 text-blue-800' :
+                        booking.status === 'in-progress' ? 'bg-purple-100 text-purple-800' :
+                          booking.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
                       }`}
                   >
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}

@@ -5,7 +5,7 @@ import WorkerEditModal from './WorkerEditModal.jsx';
 import AddWorkerModal from './AddWorkerModal.jsx';
 import { useAdmin } from '../../context/AdminContext';
 
-const API_URL_BASE = 'http://localhost:5000';
+const API_URL_BASE = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
 
 const WorkerManagement = () => {
   const { categories, subCategories } = useAdmin();

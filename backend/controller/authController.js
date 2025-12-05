@@ -103,6 +103,7 @@ export const verifyOTP = async (req, res) => {
 export const register = async (req, res) => {
   try {
     const { name, phone, userType } = req.body;
+    console.log('Register Request Body:', { ...req.body, password: '***' });
 
     if (!name || !phone) {
       return res.status(400).json({ message: "Name and Phone are required" });

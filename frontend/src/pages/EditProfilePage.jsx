@@ -7,8 +7,8 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 
-const API_URL = 'http://localhost:5000/api';
-const SERVER_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
 
 export default function EditProfilePage() {
     const navigate = useNavigate();

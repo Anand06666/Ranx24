@@ -49,7 +49,7 @@ export default function SignupPage() {
             }
         } catch (error) {
             console.error("Error creating user:", error);
-            const errorMessage = error.response?.data?.message || "Failed to create account. Please try again.";
+            const errorMessage = error.response?.data?.message || error.message || "Failed to create account. Please try again.";
             toast.error(errorMessage);
         }
     };

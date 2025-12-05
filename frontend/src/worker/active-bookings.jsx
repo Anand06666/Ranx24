@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaCheckCircle, FaClock, FaList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function WorkerActiveBookings() {
   const navigate = useNavigate();

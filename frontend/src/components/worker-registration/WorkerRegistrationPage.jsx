@@ -8,6 +8,8 @@ import PersonalDetailsStep from "./PersonalDetailsStep";
 import VerificationStep from "./VerificationStep";
 import ServicesStep from "./ServicesStep";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const STEPS = {
   1: LocationStep,
   2: PersonalDetailsStep,
@@ -96,7 +98,7 @@ export default function WorkerRegistrationPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/workers/register",
+        `${API_URL}/workers/register`,
         data
       );
 

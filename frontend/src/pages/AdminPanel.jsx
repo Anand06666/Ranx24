@@ -22,7 +22,7 @@ import WithdrawalManagement from "../components/admin-panel/WithdrawalManagement
 import UserAppDashboard from "../components/admin-panel/UserAppDashboard";
 import WorkerAppDashboard from "../components/admin-panel/WorkerAppDashboard";
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function AdminPanel() {
   // UI state

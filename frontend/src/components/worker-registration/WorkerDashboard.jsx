@@ -8,7 +8,8 @@ import {
 import toast from "react-hot-toast";
 import { useSocket } from "../../context/SocketContext";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || "http://localhost:5000";
 
 export default function WorkerDashboard() {
   const [worker, setWorker] = useState(null);
@@ -360,7 +361,7 @@ function Sidebar({ open, setOpen, worker, navigate }) {
         <div className="absolute bottom-0 left-0 w-full p-6">
           <div className="flex items-center gap-3 bg-blue-800 p-3 rounded-xl">
             <img
-              src={worker.livePhoto ? `http://localhost:5000/uploads/${worker.livePhoto}` : "https://via.placeholder.com/40"}
+              src={worker.livePhoto ? `${SERVER_URL}/uploads/${worker.livePhoto}` : "https://via.placeholder.com/40"}
               onError={(e) => e.target.src = "https://via.placeholder.com/40"}
               alt="Profile"
               className="w-10 h-10 rounded-full object-cover border-2 border-yellow-400"
@@ -377,7 +378,7 @@ function Sidebar({ open, setOpen, worker, navigate }) {
 }
 
 function Header({ worker, setSidebarOpen }) {
-  const [imgSrc, setImgSrc] = useState(worker.livePhoto ? `http://localhost:5000/uploads/${worker.livePhoto}` : "https://via.placeholder.com/40");
+  const [imgSrc, setImgSrc] = useState(worker.livePhoto ? `${SERVER_URL}/uploads/${worker.livePhoto}` : "https://via.placeholder.com/40");
 
   const handleError = () => {
     if (imgSrc !== "https://via.placeholder.com/40") {
