@@ -8,6 +8,4 @@ dist/
 build/
 coverage/
 
-# Mobile apps (ignored as per user request)
-app/
-worker-app/
+
