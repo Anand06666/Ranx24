@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "197754069372",
+    "project_id": "yellowcaps-863ab",
+    "storage_bucket": "yellowcaps-863ab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197754069372:android:83502716c12ef9a03144f9",
+        "android_client_info": {
+          "package_name": "com.yellowcapp.user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiijAdp5b_eX3FOARDXzkwRPvH0DxlC-g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:197754069372:android:a3fc4dbc963601583144f9",
+        "android_client_info": {
+          "package_name": "com.yellowcaps.worker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiijAdp5b_eX3FOARDXzkwRPvH0DxlC-g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
