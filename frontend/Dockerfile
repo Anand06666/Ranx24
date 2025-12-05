@@ -9,7 +9,7 @@ RUN npm run build
 # Production Stage
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
 RUN ls -R /usr/share/nginx/html
 RUN chmod -R 755 /usr/share/nginx/html
 EXPOSE 80
