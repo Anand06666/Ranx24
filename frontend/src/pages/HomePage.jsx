@@ -3,8 +3,8 @@ import axiosInstance from '../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { useLocation } from '../context/LocationContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:5000/api';
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend.ranx24.com/api';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);

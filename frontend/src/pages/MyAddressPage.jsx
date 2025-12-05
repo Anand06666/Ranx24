@@ -9,7 +9,7 @@ import Skeleton from '../components/ui/Skeleton';
 import EmptyState from '../components/ui/EmptyState';
 import Badge from '../components/ui/Badge';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend.ranx24.com/api';
 
 export default function MyAddressPage() {
   const navigate = useNavigate();

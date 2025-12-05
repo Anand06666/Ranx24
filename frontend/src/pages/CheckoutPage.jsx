@@ -17,7 +17,7 @@ import {
   LucideLoader
 } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -444,8 +444,8 @@ export default function CheckoutPage() {
                 <div
                   onClick={() => setPaymentMethod('cash')}
                   className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${paymentMethod === 'cash'
-                      ? 'border-blue-600 bg-blue-50/50 shadow-md shadow-blue-100'
-                      : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50'
+                    ? 'border-blue-600 bg-blue-50/50 shadow-md shadow-blue-100'
+                    : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50'
                     }`}
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -464,8 +464,8 @@ export default function CheckoutPage() {
                 <div
                   onClick={() => setPaymentMethod('online')}
                   className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${paymentMethod === 'online'
-                      ? 'border-blue-600 bg-blue-50/50 shadow-md shadow-blue-100'
-                      : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50'
+                    ? 'border-blue-600 bg-blue-50/50 shadow-md shadow-blue-100'
+                    : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50'
                     }`}
                 >
                   <div className="flex items-center justify-between mb-3">

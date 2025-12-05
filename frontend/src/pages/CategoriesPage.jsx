@@ -4,7 +4,7 @@ import axiosInstance from '../utils/axiosConfig';
 import { useLocation } from '../context/LocationContext';
 import { LucideSearch, LucideArrowRight, LucideArrowLeft } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function CategoriesPage() {
     const navigate = useNavigate();

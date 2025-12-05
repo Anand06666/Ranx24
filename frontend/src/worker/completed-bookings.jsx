@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaCheckCircle, FaCalendarCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://backend.ranx24.com/api";
 
 export default function WorkerCompletedBookings() {
   const navigate = useNavigate();

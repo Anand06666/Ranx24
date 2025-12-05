@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { LucideTrash2, LucideCheckCircle, LucideLock, LucideCalendar, LucideClock, LucideShoppingBag, LucideMapPin } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function UserCart() {
   const { cartItems, loading, error, removeFromCart, clearCart } = useCart();

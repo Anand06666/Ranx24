@@ -8,7 +8,7 @@ import PersonalDetailsStep from "./PersonalDetailsStep";
 import VerificationStep from "./VerificationStep";
 import ServicesStep from "./ServicesStep";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://backend.ranx24.com/api";
 
 const STEPS = {
   1: LocationStep,

@@ -8,7 +8,7 @@ import { LucideCalendar, LucideClock, LucideMapPin, LucideChevronLeft, LucideShi
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function BookingPage() {
   const { id } = useParams();

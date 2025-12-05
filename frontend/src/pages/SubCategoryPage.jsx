@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
 import { LucideSearch, LucideArrowLeft, LucideCheck, LucideClock } from 'lucide-react';
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function SubCategoryPage() {
     const { id } = useParams();

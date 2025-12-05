@@ -8,7 +8,7 @@ const AdminRegisterPage = () => {
 
   const handleAdminRegister = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const API_URL = import.meta.env.VITE_API_URL || 'https://backend.ranx24.com/api';
       const response = await fetch(`${API_URL}/admin/register`, {
         method: 'POST',
         headers: {

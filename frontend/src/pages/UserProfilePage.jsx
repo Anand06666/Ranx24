@@ -9,8 +9,8 @@ import Button from '../components/ui/Button';
 import Skeleton from '../components/ui/Skeleton';
 import { useAuth } from '../context/AuthContext';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://backend.ranx24.com/api';
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
 export default function UserProfilePage() {
     const navigate = useNavigate();
