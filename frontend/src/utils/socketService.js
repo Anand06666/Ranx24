@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
             console.log(`[Socket] Attempting to connect to ${serverUrl}`);
             const newSocket = io(serverUrl, {
                 auth: { token },
-                transports: ['websocket'],
+                transports: ['polling', 'websocket'],
                 withCredentials: true,
             });
 
