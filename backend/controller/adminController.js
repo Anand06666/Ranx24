@@ -187,14 +187,17 @@ export const adminLogin = async (req, res) => {
   try {
     // Find admin by mobile number
     const admin = await Admin.findOne({ mobileNumber });
+    console.log('Admin Login Attempt:', { mobileNumber, password });
 
     // Check if admin exists
     if (!admin) {
+      console.log('Admin not found in DB');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Compare passwords (NOTE: In a real application, use bcrypt for password hashing and comparison)
     if (admin.password !== password) {
+      console.log('Password mismatch. DB:', admin.password, 'Input:', password);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
