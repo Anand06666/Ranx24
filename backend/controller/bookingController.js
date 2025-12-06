@@ -1865,4 +1865,5 @@ export const assignWorker = async (req, res) => {
     console.error('Error assigning worker:', error);
     res.status(500).json({ message: 'Server error while assigning worker' });
   }
-};
+}; 
+ 
