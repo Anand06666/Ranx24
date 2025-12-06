@@ -61,8 +61,8 @@ const ContactPage = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-lg mb-1">Phone</h3>
-                                    <p className="text-blue-100">+91 98765 43210</p>
-                                    <p className="text-blue-100">+91 12345 67890</p>
+                                    <p className="text-blue-100">+91 9546806196</p>
+                                    
                                 </div>
                             </div>
 
@@ -84,9 +84,9 @@ const ContactPage = () => {
                                 <div>
                                     <h3 className="font-semibold text-lg mb-1">Office</h3>
                                     <p className="text-blue-100">
-                                        123, Civil Lines,<br />
-                                        Prayagraj, Uttar Pradesh,<br />
-                                        India - 211001
+                                        Patahi, Muzaffarpur,<br />
+                                        Prayagraj, Bihar,<br />
+                                        India - 833113
                                     </p>
                                 </div>
                             </div>
