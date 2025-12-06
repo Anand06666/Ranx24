@@ -1865,7 +1865,8 @@ export const assignWorker = async (req, res) => {
     console.error('Error assigning worker:', error);
     res.status(500).json({ message: 'Server error while assigning worker' });
   }
-}; 
+};
+ 
  
 // @desc    Cancel a booking
 // @route   PUT /api/bookings/:id/cancel
@@ -1890,59 +1891,59 @@ export const cancelBooking = async (req, res) => {
 
     // Check if already cancelled
     if (booking.status === 'cancelled') {
-        return res.status(400).json({ message: 'Booking is already cancelled.' });
+      return res.status(400).json({ message: 'Booking is already cancelled.' });
     }
 
     const previousStatus = booking.status;
     const previousPaymentStatus = booking.paymentStatus;
-    
+
     booking.status = 'cancelled';
-    
+
     // Process Refund if paid
     let refundProcessed = false;
     let refundAmount = 0;
 
     if (previousPaymentStatus === 'paid' && (booking.amountPaid > 0 || booking.walletAmountUsed > 0)) {
-        // Refund Wallet Amount
-        if (booking.walletAmountUsed > 0) {
-             const wallet = await ensureWallet(req.user._id);
-             wallet.balance += booking.walletAmountUsed;
-             wallet.transactions.push({
-                type: 'credit',
-                amount: booking.walletAmountUsed,
-                note: 'Refund for cancelled booking ' + booking._id,
-                meta: { type: 'refund', bookingId: booking._id }
-             });
-             await wallet.save();
-             refundProcessed = true;
-             refundAmount += booking.walletAmountUsed;
-        }
+      // Refund Wallet Amount
+      if (booking.walletAmountUsed > 0) {
+        const wallet = await ensureWallet(req.user._id);
+        wallet.balance += booking.walletAmountUsed;
+        wallet.transactions.push({
+          type: 'credit',
+          amount: booking.walletAmountUsed,
+          note: 'Refund for cancelled booking ' + booking._id,
+          meta: { type: 'refund', bookingId: booking._id }
+        });
+        await wallet.save();
+        refundProcessed = true;
+        refundAmount += booking.walletAmountUsed;
+      }
 
-        // Refund Online Payment (Simplify: refund to wallet if online paid?)
-        // Or just mark for manual refund?
-        // Let's autosave it to wallet for now if we don't have auto-refund API
-        if (booking.amountPaid > 0) {
-             const wallet = await ensureWallet(req.user._id);
-             wallet.balance += booking.amountPaid;
-             wallet.transactions.push({
-                type: 'credit',
-                amount: booking.amountPaid,
-                note: 'Refund (Online Payment) for cancelled booking ' + booking._id,
-                meta: { type: 'refund', bookingId: booking._id }
-             });
-             await wallet.save();
-             refundProcessed = true;
-             refundAmount += booking.amountPaid;
-        }
+      // Refund Online Payment (Simplify: refund to wallet if online paid?)
+      // Or just mark for manual refund?
+      // Let's autosave it to wallet for now if we don't have auto-refund API
+      if (booking.amountPaid > 0) {
+        const wallet = await ensureWallet(req.user._id);
+        wallet.balance += booking.amountPaid;
+        wallet.transactions.push({
+          type: 'credit',
+          amount: booking.amountPaid,
+          note: 'Refund (Online Payment) for cancelled booking ' + booking._id,
+          meta: { type: 'refund', bookingId: booking._id }
+        });
+        await wallet.save();
+        refundProcessed = true;
+        refundAmount += booking.amountPaid;
+      }
     }
 
     const updatedBooking = await booking.save();
-    
+
     res.json({
-        message: 'Booking cancelled successfully',
-        booking: updatedBooking,
-        refundProcessed,
-        refundAmount
+      message: 'Booking cancelled successfully',
+      booking: updatedBooking,
+      refundProcessed,
+      refundAmount
     });
   } catch (error) {
     console.error('Error cancelling booking:', error);
