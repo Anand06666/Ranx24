@@ -327,6 +327,7 @@ export const createSubCategory = async (req, res) => {
       const subCategory = { name, image: imagePath };
       category.subCategories.push(subCategory);
       await category.save();
+      cacheService.delete(cacheKeys.categories()); // Invalidate cache
       res.status(201).json(category);
     } else {
       if (imagePath) {
@@ -424,6 +425,7 @@ export const deleteSubCategory = async (req, res) => {
       if (subCategory) {
         await subCategory.deleteOne();
         await category.save();
+        cacheService.delete(cacheKeys.categories()); // Invalidate cache
         res.json(category);
       } else {
         res.status(404).json({ message: 'Sub-category not found' });
