@@ -1042,7 +1042,10 @@ export const adminOverrideStatus = async (req, res) => {
 // @access  Private (User/Worker/Admin)
 export const getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id)
+    const bookingId = req.params.id;
+    // console.log(`Fetching booking details for ID: ${bookingId}, User: ${req.user?._id}`);
+
+    const booking = await Booking.findById(bookingId)
       .populate('user', 'name email phone')
       .populate('worker', 'firstName lastName mobileNumber livePhoto price');
 
@@ -1051,9 +1054,8 @@ export const getBookingById = async (req, res) => {
     }
 
     // Authorization: Only the user who created the booking, the assigned worker, or an admin can view it
-    // Authorization: Only the user who created the booking, the assigned worker, or an admin can view it
     const isUser = booking.user && booking.user._id.toString() === req.user._id.toString();
-    const isWorker = booking.worker && booking.worker._id.toString() === req.user._id.toString();
+    const isWorker = booking.worker && booking.worker._id && booking.worker._id.toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'admin';
 
     if (!isUser && !isWorker && !isAdmin) {
@@ -1062,8 +1064,11 @@ export const getBookingById = async (req, res) => {
 
     res.json(booking);
   } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid Booking ID format' });
+    }
     console.error('Error fetching booking by ID:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error while fetching booking details' });
   }
 };
 
