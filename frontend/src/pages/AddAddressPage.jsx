@@ -26,9 +26,45 @@ export default function AddAddressPage() {
         isDefault: false,
     });
 
-    // ... handleChange remain the same
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value,
+        });
+    };
 
-    // ... handleSubmit remain the same
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validation using backend field names
+        if (!formData.addressLine1 || !formData.city || !formData.state || !formData.pincode) {
+            toast.error('Please fill all required fields');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            const config = {
+                headers: { Authorization: `Bearer ${token}` },
+            };
+
+            await axios.post(`${API_URL}/addresses`, formData, config);
+            toast.success('Address added successfully!');
+            navigate('/my-address');
+        } catch (error) {
+            console.error('Error adding address:', error);
+            toast.error(error.response?.data?.message || 'Failed to add address');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
