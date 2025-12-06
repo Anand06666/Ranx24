@@ -170,6 +170,7 @@ export const updateCategory = async (req, res) => {
       }
 
       const updatedCategory = await category.save();
+      cacheService.delete(cacheKeys.categories()); // Invalidate cache
       res.json(updatedCategory);
     } else {
       res.status(404).json({ message: 'Category not found' });
@@ -189,6 +190,7 @@ export const deleteCategory = async (req, res) => {
 
     if (category) {
       await Category.deleteOne({ _id: req.params.id });
+      cacheService.delete(cacheKeys.categories()); // Invalidate cache
       res.json({ message: 'Category removed' });
     } else {
       res.status(404).json({ message: 'Category not found' });

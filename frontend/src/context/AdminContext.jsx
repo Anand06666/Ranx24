@@ -117,7 +117,8 @@ export const AdminProvider = ({ children }) => {
             toast.success("Category deleted successfully");
             return true;
         } catch (err) {
-            toast.error("Failed to delete category");
+            console.error("Delete Category Error:", err);
+            toast.error(err.response?.data?.message || "Failed to delete category");
             return false;
         }
     };
