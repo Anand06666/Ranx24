@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { useLocation } from '../context/LocationContext';
-import { LucideSearch, LucideMapPin, LucideShieldCheck, LucideClock, LucideStar, LucideArrowRight, LucideX, LucideChevronDown } from 'lucide-react';
+import { LucideSearch, LucideMapPin, LucideShieldCheck, LucideClock, LucideStar, LucideArrowRight, LucideX, LucideChevronDown, LucideDownload } from 'lucide-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://www.ranx24.com';
 
@@ -138,6 +138,18 @@ const UserPage = () => {
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-semibold transition-colors ml-2">
               Search
             </button>
+          </div>
+
+          <div className="mt-8 animate-fade-in-up delay-200">
+            <a
+              href="/ranx24.apk"
+              download
+              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full font-bold transition-all shadow-lg hover:shadow-green-500/30 transform hover:-translate-y-1"
+            >
+              <LucideDownload size={20} />
+              Download Android App
+            </a>
+            <p className="text-blue-200 text-sm mt-2">Get the best experience on mobile</p>
           </div>
         </div>
       </section>
