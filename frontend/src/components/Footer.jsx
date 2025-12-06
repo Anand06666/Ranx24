@@ -41,9 +41,8 @@ export default function Footer() {
                     <div>
                         <h3 className="text-lg font-semibold mb-6 text-white">For Professionals</h3>
                         <ul className="space-y-3 text-gray-400 text-sm">
-                            <li><FooterLink to="/worker-login">Join as a Professional</FooterLink></li>
+                            <li><FooterLink to="/worker-register">Join as a Professional</FooterLink></li>
                             <li><FooterLink to="/worker-login">Worker Login</FooterLink></li>
-                            <li><FooterLink to="/admin-login">Admin Login</FooterLink></li>
                             <li><FooterLink to="/help">Help Center</FooterLink></li>
                         </ul>
                     </div>
@@ -58,11 +57,11 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <LucidePhone size={18} className="text-blue-500 mt-0.5" />
-                                <span>+1 (800) 555-2407</span>
+                                <span>+91 9546806196</span>
                             </li>
                             <li className="flex items-start gap-3">
                                 <LucideMapPin size={18} className="text-blue-500 mt-0.5" />
-                                <span>123 Innovation Dr,<br />Silicon Valley, CA 94025</span>
+                                <span>Patahi,Muzaffarpur,Bihar 843113</span>
                             </li>
                         </ul>
                     </div>
