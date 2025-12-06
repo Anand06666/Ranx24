@@ -60,7 +60,8 @@ export const getServiceById = async (req, res) => {
             }
             res.json(serviceObj);
         } else {
-            res.status(404).json({ message: 'Service not found' });
+            console.warn(`Service not found for ID: ${req.params.id}`);
+            res.status(404).json({ message: 'Service not found or outdated ID' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });

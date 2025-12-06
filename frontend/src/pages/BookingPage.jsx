@@ -69,7 +69,12 @@ export default function BookingPage() {
       }
     } catch (error) {
       console.error("Error fetching service details:", error);
-      toast.error("Failed to load service details");
+      if (error.response && error.response.status === 404) {
+        toast.error("Service no longer exists. Please select another.");
+        navigate('/categories');
+      } else {
+        toast.error("Failed to load service details");
+      }
     } finally {
       setLoading(false);
     }
