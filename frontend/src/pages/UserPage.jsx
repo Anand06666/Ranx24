@@ -217,88 +217,11 @@ const UserPage = () => {
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
             <p className="text-gray-500 text-lg">No services found matching your search.</p>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredCategories.map((category) => (
-              <Link key={category._id} to={`/category/${category._id}`} className="group">
-                <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full flex flex-col">
-                  <div className="h-48 overflow-hidden relative">
-                    <img
-                      src={`${SERVER_URL}/${category.image}`}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/300?text=Service'; }}
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                  </div>
-                  <div className="p-5 flex-grow flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{category.name}</h3>
-                      <p className="text-sm text-gray-500">Professional {category.name} services</p>
-                    </div>
-                    <div className="mt-4 flex items-center text-blue-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                      Book Now <LucideArrowRight size={14} className="ml-1" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose RanX24?</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">We are committed to providing the best home service experience with verified professionals and transparent pricing.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <FeatureCard
-              icon={<LucideShieldCheck size={40} className="text-blue-600" />}
-              title="Verified Professionals"
-              description="All our workers are background checked and trained to deliver high-quality service."
-            />
-            <FeatureCard
-              icon={<LucideClock size={40} className="text-blue-600" />}
-              title="On-Time Service"
-              description="We value your time. Our professionals arrive on schedule and complete the job efficiently."
-            />
-            <FeatureCard
-              icon={<LucideStar size={40} className="text-blue-600" />}
-              title="Top Rated Quality"
-              description="Our services are rated 4.8/5 by thousands of satisfied customers across the city."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600 text-white text-center">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to get started?</h2>
-          <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
-            Join thousands of happy customers who trust RanX24 for their home service needs.
-          </p>
-          <Link to="/categories" className="bg-white text-blue-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg">
-            Book a Service Now
-          </Link>
-        </div>
-      </section>
-    </div>
-  );
-};
-
-const FeatureCard = ({ icon, title, description }) => (
-  <div className="text-center p-8 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-gray-100">
-    <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
       {icon}
     </div>
     <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
     <p className="text-gray-500 leading-relaxed">{description}</p>
-  </div>
+  </div >
 );
 
 export default UserPage;

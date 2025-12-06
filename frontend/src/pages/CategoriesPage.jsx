@@ -87,51 +87,14 @@ export default function CategoriesPage() {
                             className="text-blue-600 font-medium hover:underline"
                         >
                             Clear Search
-                        </button>
+                            to="/"
+                            className="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 font-medium transition-colors"
+    >
+                            <LucideArrowLeft size={16} />
+                            Back to Home
+                        </Link>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredCategories.map((category) => (
-                            <Link key={category._id} to={`/category/${category._id}`} className="group block h-full">
-                                <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full flex flex-col">
-                                    <div className="h-56 overflow-hidden relative">
-                                        <img
-                                            src={`${SERVER_URL}/${category.image}`}
-                                            alt={category.name}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            onError={(e) => { e.target.src = 'https://via.placeholder.com/300?text=Service'; }}
-                                        />
-                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                                    </div>
-                                    <div className="p-6 flex-grow flex flex-col justify-between">
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                                                {category.name}
-                                            </h3>
-                                            <p className="text-gray-500 text-sm line-clamp-2 mb-4">
-                                                Professional {category.name.toLowerCase()} services tailored to your needs.
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center text-blue-600 font-medium group-hover:translate-x-1 transition-transform">
-                                            Explore <LucideArrowRight size={16} className="ml-2" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-
-                <div className="text-center mt-12">
-                    <Link
-                        to="/"
-                        className="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 font-medium transition-colors"
-                    >
-                        <LucideArrowLeft size={16} />
-                        Back to Home
-                    </Link>
-                </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

@@ -155,7 +155,7 @@ export default function BookingPage() {
             src={`${SERVER_URL}/${serviceDetails.image?.replace(/\\/g, '/')}`}
             alt={serviceDetails.name}
             className="w-20 h-20 rounded-xl object-cover"
-            onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=Service'; }}
+            onError={(e) => { e.target.src = 'https://placehold.co/300?text=Service'; }}
           />
           <div>
             <h2 className="text-lg font-bold text-gray-900">{serviceDetails.name}</h2>

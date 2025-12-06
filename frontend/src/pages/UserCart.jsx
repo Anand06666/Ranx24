@@ -73,7 +73,7 @@ export default function UserCart() {
                       src={`${SERVER_URL}/${item.image?.replace(/\\/g, '/')}`}
                       alt={item.workerName}
                       className="w-24 h-24 rounded-xl object-cover border border-gray-100"
-                      onError={(e) => { e.target.src = 'https://via.placeholder.com/150?text=Worker'; }}
+                      onError={(e) => { e.target.src = 'https://placehold.co/300?text=Worker'; }}
                     />
                   </div>
 

@@ -121,7 +121,7 @@ export default function SubCategoryPage() {
                                         src={`${SERVER_URL}/${service.image?.replace(/\\/g, '/')}`}
                                         alt={service.name}
                                         className="w-full h-full object-cover"
-                                        onError={(e) => { e.target.src = 'https://via.placeholder.com/300?text=Service'; }}
+                                        onError={(e) => { e.target.src = 'https://placehold.co/1500?text=Service'; }}
                                     />
                                 </div>
 
