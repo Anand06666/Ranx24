@@ -18,6 +18,7 @@ import {
   requestCompletionOtp,
   requestStartOtp,
   assignWorker,
+  cancelBooking,
 } from '../controller/bookingController.js';
 
 import { protect, admin } from '../middleware/authMiddleware.js';
@@ -34,6 +35,7 @@ router.post('/bulk', protect, createBulkBookings);
 router.get('/my', protect, getUserBookings);
 router.get('/:id', protect, getBookingById);
 router.put('/:id/assign', protect, admin, assignWorker);
+router.put('/:id/cancel', protect, cancelBooking);
 
 // Worker Routes
 router.get('/', protectWorker, getBookingsByQuery);

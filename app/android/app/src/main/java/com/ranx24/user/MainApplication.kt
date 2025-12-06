@@ -1,4 +1,4 @@
-package com.yellowcapp.user
+package com.RanX24.user
 
 import android.app.Application
 import android.content.res.Configuration

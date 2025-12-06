@@ -63,7 +63,7 @@ export const CartProvider = ({ children }) => {
         };
       }
 
-      await axiosInstance.post('/cart', payload);
+      await axiosInstance.post('/cart/add', payload);
       toast.success("Item added to cart");
       fetchCart();
     } catch (error) {
@@ -74,7 +74,7 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = async (itemId) => {
     try {
-      await axiosInstance.delete(`/cart/${itemId}`);
+      await axiosInstance.delete(`/cart/remove/${itemId}`);
       toast.success("Item removed from cart");
       fetchCart();
     } catch (error) {
@@ -85,7 +85,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = async () => {
     try {
-      await axiosInstance.delete('/cart');
+      await axiosInstance.delete('/cart/clear');
       setCartItems([]);
       toast.success("Cart cleared");
     } catch (error) {

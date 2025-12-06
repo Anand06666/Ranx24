@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "RanX24 User",
-    "slug": "ranx24-user",
+    "name": "RanX24",
+    "slug": "ranx24",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,14 +13,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yellowcapp.user"
+      "bundleIdentifier": "com.RanX24.user"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yellowcapp.user",
+      "package": "com.RanX24.user",
       "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {
@@ -29,7 +29,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-font",

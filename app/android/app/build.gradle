@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.yellowcapp.user'
+    namespace 'com.RanX24.user'
     defaultConfig {
-        applicationId 'com.yellowcapp.user'
+        applicationId 'com.RanX24.user'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

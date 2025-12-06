@@ -191,12 +191,49 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          {!isAuthenticated && (
+          {isAuthenticated ? (
+            <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-3 px-2 py-2 mb-2 bg-gray-50 rounded-lg">
+                <img src={userImg} alt="User" className="w-8 h-8 rounded-full" />
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                  <p className="text-xs text-gray-500">{user?.role}</p>
+                </div>
+              </div>
+
+              <Link to="/user_cart" className="flex items-center justify-between py-2 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                <span className="flex items-center"><LucideShoppingCart size={18} className="mr-3" /> Cart</span>
+                {cartItems.length > 0 && <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{cartItems.length}</span>}
+              </Link>
+
+              {user?.role === 'worker' ? (
+                <Link to="/worker-dashboard" className="flex items-center py-2 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  <LucideUser size={18} className="mr-3" /> Worker Dashboard
+                </Link>
+              ) : user?.role === 'admin' ? (
+                <Link to="/admin-dashboard" className="flex items-center py-2 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  <LucideUser size={18} className="mr-3" /> Admin Dashboard
+                </Link>
+              ) : (
+                <Link to="/profile" className="flex items-center py-2 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                  <LucideUser size={18} className="mr-3" /> My Profile
+                </Link>
+              )}
+
+              <Link to="/my-bookings" className="flex items-center py-2 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
+                <span className="flex items-center"><LucideMenu size={18} className="mr-3" /> My Bookings</span>
+              </Link>
+
+              <button onClick={handleLogout} className="flex items-center py-2 text-red-600 font-medium mt-1">
+                <LucideLogOut size={18} className="mr-3" /> Logout
+              </button>
+            </div>
+          ) : (
             <div className="flex flex-col gap-3 mt-2">
-              <Link to="/login" className="w-full text-center py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium">
+              <Link to="/login" className="w-full text-center py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Log in
               </Link>
-              <Link to="/categories" className="w-full text-center py-2.5 rounded-lg bg-blue-600 text-white font-medium">
+              <Link to="/categories" className="w-full text-center py-2.5 rounded-lg bg-blue-600 text-white font-medium" onClick={() => setMobileMenuOpen(false)}>
                 Book Now
               </Link>
             </div>
