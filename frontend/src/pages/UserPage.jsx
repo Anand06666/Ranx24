@@ -240,7 +240,7 @@ const UserPage = () => {
             </Link>
           ))}
         </div>
-        )}
+        }
       </section>
 
       {/* Features Section */}
