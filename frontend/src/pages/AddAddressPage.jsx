@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaMapMarkerAlt, FaSave } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import Navbar from '../components/Navbar';
+// Navbar removed to prevent double rendering
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 
@@ -13,11 +13,11 @@ export default function AddAddressPage() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        label: '',
-        street: '',
+        type: '', // Changed from label
+        addressLine1: '', // Changed from street
         city: '',
         state: '',
-        zipCode: '',
+        pincode: '', // Changed from zipCode
         isDefault: false,
     });
 
@@ -32,8 +32,8 @@ export default function AddAddressPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validation
-        if (!formData.street || !formData.city || !formData.state || !formData.zipCode) {
+        // Validation using backend field names
+        if (!formData.addressLine1 || !formData.city || !formData.state || !formData.pincode) {
             toast.error('Please fill all required fields');
             return;
         }
@@ -63,7 +63,7 @@ export default function AddAddressPage() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Navbar />
+            {/* Navbar removed */}
 
             <div className="max-w-2xl mx-auto px-4 py-8">
                 {/* Header */}
@@ -78,30 +78,30 @@ export default function AddAddressPage() {
                 {/* Form */}
                 <Card>
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Label */}
+                        {/* Label (Type) */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                Address Label (Optional)
+                                Address Type (Optional)
                             </label>
                             <input
                                 type="text"
-                                name="label"
-                                value={formData.label}
+                                name="type"
+                                value={formData.type}
                                 onChange={handleChange}
                                 placeholder="e.g., Home, Office, etc."
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
 
-                        {/* Street */}
+                        {/* Street (Address Line 1) */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 Street Address <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                name="street"
-                                value={formData.street}
+                                name="addressLine1"
+                                value={formData.addressLine1}
                                 onChange={handleChange}
                                 placeholder="House/Flat No., Building Name, Street"
                                 required
@@ -142,15 +142,15 @@ export default function AddAddressPage() {
                             </div>
                         </div>
 
-                        {/* ZIP Code */}
+                        {/* Pincode (ZipCode) */}
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                ZIP Code <span className="text-red-500">*</span>
+                                Pincode <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
-                                name="zipCode"
-                                value={formData.zipCode}
+                                name="pincode"
+                                value={formData.pincode}
                                 onChange={handleChange}
                                 placeholder="6-digit PIN code"
                                 required
