@@ -82,19 +82,51 @@ export default function CategoriesPage() {
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">No services found</h3>
                         <p className="text-gray-500 mb-6">We couldn't find any services matching "{searchTerm}"</p>
-                        <button
-                            onClick={() => setSearchTerm('')}
-                            className="text-blue-600 font-medium hover:underline"
-                        >
-                            Clear Search
-                            to="/"
-                            className="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 font-medium transition-colors"
-    >
-                            <LucideArrowLeft size={16} />
-                            Back to Home
-                        </Link>
+                        <div className="flex flex-col items-center gap-4">
+                            <button
+                                onClick={() => setSearchTerm('')}
+                                className="text-blue-600 font-medium hover:underline"
+                            >
+                                Clear Search
+                            </button>
+                            <Link
+                                to="/"
+                                className="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 font-medium transition-colors"
+                            >
+                                <LucideArrowLeft size={16} />
+                                Back to Home
+                            </Link>
+                        </div>
                     </div>
-            </div >
-        </div >
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {filteredCategories.map((category) => (
+                            <Link key={category._id} to={`/category/${category._id}`} className="group">
+                                <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full flex flex-col">
+                                    <div className="h-48 overflow-hidden relative">
+                                        <img
+                                            src={`${SERVER_URL}/${category.image}`}
+                                            alt={category.name}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            onError={(e) => { e.target.src = 'https://placehold.co/300?text=' + category.name; }}
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+                                    </div>
+                                    <div className="p-5 flex-grow flex flex-col justify-between">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{category.name}</h3>
+                                            <p className="text-sm text-gray-500">Professional {category.name} services</p>
+                                        </div>
+                                        <div className="mt-4 flex items-center text-blue-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                            Book Now <LucideArrowRight size={14} className="ml-1" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 }
