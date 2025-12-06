@@ -29,7 +29,7 @@ try {
 }
 
 const app = express();
-app.set('trust proxy', true); // Trust all proxies (needed for Coolify/Nginx/Docker)
+app.set('trust proxy', 'loopback, linklocal, uniquelocal'); // Trust local proxies (Docker/Nginx)
 
 // Security Middleware
 import helmet from "helmet";
