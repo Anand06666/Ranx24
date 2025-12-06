@@ -213,34 +213,38 @@ const UserPage = () => {
           </Link>
         </div>
 
+        {filteredCategories.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-gray-500 text-lg">No services found matching your search.</p>
+          </div>
         ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredCategories.map((category) => (
-            <Link key={category._id} to={`/category/${category._id}`} className="group">
-              <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full flex flex-col">
-                <div className="h-48 overflow-hidden relative">
-                  <img
-                    src={`${SERVER_URL}/${category.image}`}
-                    alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => { e.target.src = 'https://placehold.co/300?text=' + category.name; }}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                </div>
-                <div className="p-5 flex-grow flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{category.name}</h3>
-                    <p className="text-sm text-gray-500">Professional {category.name} services</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredCategories.map((category) => (
+              <Link key={category._id} to={`/category/${category._id}`} className="group">
+                <div className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden h-full flex flex-col">
+                  <div className="h-48 overflow-hidden relative">
+                    <img
+                      src={`${SERVER_URL}/${category.image}`}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => { e.target.src = 'https://placehold.co/300?text=' + category.name; }}
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                   </div>
-                  <div className="mt-4 flex items-center text-blue-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                    Book Now <LucideArrowRight size={14} className="ml-1" />
+                  <div className="p-5 flex-grow flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{category.name}</h3>
+                      <p className="text-sm text-gray-500">Professional {category.name} services</p>
+                    </div>
+                    <div className="mt-4 flex items-center text-blue-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                      Book Now <LucideArrowRight size={14} className="ml-1" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-        }
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Features Section */}
