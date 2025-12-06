@@ -907,29 +907,83 @@ export const updateStatus = async (req, res) => {
 // @desc    Cancel a booking (User)
 // @route   PUT /api/bookings/:id/cancel
 // @access  Private (User)
+// @desc    Cancel a booking
+// @route   PUT /api/bookings/:id/cancel
+// @access  Private (User)
 export const cancelBooking = async (req, res) => {
-  const { id } = req.params; // Booking ID
-
   try {
-    const booking = await Booking.findById(id);
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
-      return res.status(404).json({ message: 'Booking not found.' });
+      return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Authorization: Only the user who created the booking can cancel it
-    if (booking.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to cancel this booking.' });
+    // Check ownership
+    if (booking.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(401).json({ message: 'Not authorized to cancel this booking' });
     }
 
-    // Only pending bookings can be cancelled by the user
-    if (booking.status !== 'pending') {
-      return res.status(400).json({ message: `Booking cannot be cancelled as its status is '${booking.status}'.` });
+    // Check if worker is assigned
+    if (booking.worker) {
+      return res.status(400).json({ message: 'Cannot cancel booking after a worker has been assigned.' });
     }
+
+    // Check if already cancelled
+    if (booking.status === 'cancelled') {
+      return res.status(400).json({ message: 'Booking is already cancelled.' });
+    }
+
+    const previousStatus = booking.status;
+    const previousPaymentStatus = booking.paymentStatus;
 
     booking.status = 'cancelled';
+
+    // Process Refund if paid
+    let refundProcessed = false;
+    let refundAmount = 0;
+
+    if (previousPaymentStatus === 'paid' && (booking.amountPaid > 0 || booking.walletAmountUsed > 0)) {
+      // Refund Wallet Amount
+      if (booking.walletAmountUsed > 0) {
+        const wallet = await ensureWallet(req.user._id);
+        wallet.balance += booking.walletAmountUsed;
+        wallet.transactions.push({
+          type: 'credit',
+          amount: booking.walletAmountUsed,
+          note: `Refund for cancelled booking #${booking._id}`,
+          meta: { type: 'refund', bookingId: booking._id }
+        });
+        await wallet.save();
+        refundProcessed = true;
+        refundAmount += booking.walletAmountUsed;
+      }
+
+      // Refund Online Payment (Simplify: refund to wallet if online paid?)
+      // Or just mark for manual refund?
+      // Let's autosave it to wallet for now if we don't have auto-refund API
+      if (booking.amountPaid > 0) {
+        const wallet = await ensureWallet(req.user._id);
+        wallet.balance += booking.amountPaid;
+        wallet.transactions.push({
+          type: 'credit',
+          amount: booking.amountPaid,
+          note: `Refund (Online Payment) for cancelled booking #${booking._id}`,
+          meta: { type: 'refund', bookingId: booking._id }
+        });
+        await wallet.save();
+        refundProcessed = true;
+        refundAmount += booking.amountPaid;
+      }
+    }
+
     const updatedBooking = await booking.save();
-    res.json(updatedBooking);
+
+    res.json({
+      message: 'Booking cancelled successfully',
+      booking: updatedBooking,
+      refundProcessed,
+      refundAmount
+    });
   } catch (error) {
     console.error('Error cancelling booking:', error);
     res.status(500).json({ message: 'Server error while cancelling booking.' });
@@ -1866,8 +1920,8 @@ export const assignWorker = async (req, res) => {
     res.status(500).json({ message: 'Server error while assigning worker' });
   }
 };
- 
- 
+
+
 // @desc    Cancel a booking
 // @route   PUT /api/bookings/:id/cancel
 // @access  Private (User)
@@ -1950,4 +2004,3 @@ export const cancelBooking = async (req, res) => {
     res.status(500).json({ message: 'Server error while cancelling booking.' });
   }
 };
-
