@@ -82,6 +82,7 @@ import HelpManagement from "./components/admin-panel/HelpManagement";
 import UserPushNotifications from "./components/admin-panel/UserPushNotifications";
 import WorkerPushNotifications from "./components/admin-panel/WorkerPushNotifications";
 import EmployeeManagement from "./components/admin-panel/EmployeeManagement";
+const AdminChangePassword = lazy(() => import("./pages/AdminChangePassword"));
 
 import UserLayout from "./components/UserLayout";
 
@@ -156,6 +157,7 @@ export default function App() {
                 <Route path="notifications/user" element={<UserPushNotifications />} />
                 <Route path="notifications/worker" element={<WorkerPushNotifications />} />
                 <Route path="employees" element={<EmployeeManagement />} />
+                <Route path="change-password" element={<AdminChangePassword />} />
               </Route>
               {/* Assign Worker Page - Outside Layout to take full width/focus */}
               <Route path="/admin/bookings/:id/assign" element={<AssignWorkerPage />} />

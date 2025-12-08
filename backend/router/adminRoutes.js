@@ -1,4 +1,4 @@
-import { adminLogin, adminRegister, getAllUsers, deleteUser, createUser, getDashboardStats, getWithdrawalRequests, approveWithdrawal, rejectWithdrawal, createEmployee, getEmployees, deleteEmployee } from '../controller/adminController.js';
+import { adminLogin, adminRegister, getAllUsers, deleteUser, createUser, getDashboardStats, getWithdrawalRequests, approveWithdrawal, rejectWithdrawal, createEmployee, getEmployees, deleteEmployee, changePassword } from '../controller/adminController.js';
 
 const router = express.Router();
 
@@ -9,6 +9,9 @@ router.post('/register', adminRegister);
 router.post('/login', adminLogin);
 
 import { protect, admin, staff } from '../middleware/authMiddleware.js';
+
+// Change Password Route (Protected, Accessible by Admin/Staff)
+router.put('/change-password', protect, staff, changePassword);
 
 // Employee Management Routes (Super Admin Only)
 router.post('/employees', protect, admin, createEmployee);

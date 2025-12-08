@@ -18,7 +18,8 @@ import {
   CreditCard,
   Bell,
   Megaphone,
-  Briefcase
+  Briefcase,
+  Key
 } from 'lucide-react';
 import logo from '../../assets/images/logo.png';
 
@@ -117,6 +118,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <NavItem to="/admin-dashboard/employees" label="Employees" icon={Users} />
             </>
           )}
+
+
+          <SectionLabel label="Settings" />
+          <NavItem to="/admin-dashboard/change-password" label="Change Password" icon={Key} />
 
           <SectionLabel label="Support" />
           <NavItem to="/admin-dashboard/help" label="Help & Support" icon={LifeBuoy} />

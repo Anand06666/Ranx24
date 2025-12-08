@@ -379,3 +379,32 @@ export const deleteEmployee = async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+// @desc    Change Admin/Employee Password
+// @route   PUT /api/admin/change-password
+// @access  Private (Admin/Employee)
+export const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const admin = await Admin.findById(req.user._id);
+
+    if (!admin) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check old password (simple string comparison as per existing logic)
+    // NOTE: In production, both oldPassword and admin.password should be hashed
+    if (admin.password !== oldPassword) {
+      return res.status(400).json({ message: 'Invalid old password' });
+    }
+
+    admin.password = newPassword;
+    await admin.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
