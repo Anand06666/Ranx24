@@ -22,6 +22,8 @@ backend_error_log.txt
 config/serviceAccountKey.json
 config/firebase-credentials.json
 firebase-credentials.json
+temp_key.json
+debug-start.js
 *.pem
 *.key
 *.p12

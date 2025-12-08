@@ -1043,7 +1043,7 @@ export const adminOverrideStatus = async (req, res) => {
 export const getBookingById = async (req, res) => {
   try {
     const bookingId = req.params.id;
-    // console.log(`Fetching booking details for ID: ${bookingId}, User: ${req.user?._id}`);
+    console.log(`🔍 [DEBUG] getBookingById: Booking=${bookingId}, User=${req.user?._id}, Role=${req.user?.role}`);
 
     const booking = await Booking.findById(bookingId)
       .populate('user', 'name email phone')
@@ -1059,7 +1059,17 @@ export const getBookingById = async (req, res) => {
     const isAdmin = req.user.role === 'admin';
 
     if (!isUser && !isWorker && !isAdmin) {
-      return res.status(403).json({ message: 'Not authorized to view this booking' });
+      console.log(`⛔ [DEBUG] Authorization Failed!`);
+      console.log(`   - Booking User: ${booking.user ? booking.user._id : 'null'}`);
+      console.log(`   - Req User: ${req.user._id}`);
+      return res.status(403).json({
+        message: 'Not authorized to view this booking',
+        debug_info: {
+          bookingUser: booking.user ? booking.user._id.toString() : 'null',
+          requestUser: req.user._id.toString(),
+          role: req.user.role
+        }
+      });
     }
 
     res.json(booking);
