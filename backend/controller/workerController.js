@@ -599,7 +599,7 @@ export const getWorkerStats = async (req, res) => {
     // Calculate earnings (sum of totalAmount for completed bookings)
     const earningsResult = await Booking.aggregate([
       { $match: { worker: new mongoose.Types.ObjectId(workerId), status: 'completed' } },
-      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      { $group: { _id: null, total: { $sum: '$finalPrice' } } }
     ]);
     const earnings = earningsResult.length > 0 ? earningsResult[0].total : 0;
 

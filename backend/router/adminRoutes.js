@@ -1,5 +1,4 @@
-import express from 'express';
-import { adminLogin, adminRegister, getAllUsers, deleteUser, createUser, getDashboardStats, getWithdrawalRequests, approveWithdrawal, rejectWithdrawal } from '../controller/adminController.js';
+import { adminLogin, adminRegister, getAllUsers, deleteUser, createUser, getDashboardStats, getWithdrawalRequests, approveWithdrawal, rejectWithdrawal, createEmployee, getEmployees, deleteEmployee } from '../controller/adminController.js';
 
 const router = express.Router();
 
@@ -9,27 +8,32 @@ router.post('/register', adminRegister);
 // Admin Login Route
 router.post('/login', adminLogin);
 
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, admin, staff } from '../middleware/authMiddleware.js';
 
-// Get dashboard stats
-router.get('/stats', protect, admin, getDashboardStats);
+// Employee Management Routes (Super Admin Only)
+router.post('/employees', protect, admin, createEmployee);
+router.get('/employees', protect, admin, getEmployees);
+router.delete('/employees/:id', protect, admin, deleteEmployee);
 
-// Get all users route
-router.get('/users', protect, admin, getAllUsers);
+// Get dashboard stats (Staff access, logic inside handles data visibility)
+router.get('/stats', protect, staff, getDashboardStats);
 
-// Create user route
-router.post('/users', protect, admin, createUser);
+// Get all users route (Staff can view users)
+router.get('/users', protect, staff, getAllUsers);
 
-// Delete user route
+// Create user route (Staff can create users)
+router.post('/users', protect, staff, createUser);
+
+// Delete user route (Super Admin Only)
 router.delete('/users/:id', protect, admin, deleteUser);
 
 import { getFees, updateFees } from '../controller/feeController.js';
 
-// Fee Management Routes
+// Fee Management Routes (Super Admin Only)
 router.get('/fees', protect, getFees);
 router.put('/fees', protect, admin, updateFees);
 
-// Withdrawal Management Routes
+// Withdrawal Management Routes (Super Admin Only)
 router.get('/withdrawals', protect, admin, getWithdrawalRequests);
 router.put('/withdrawals/:id/approve', protect, admin, approveWithdrawal);
 router.put('/withdrawals/:id/reject', protect, admin, rejectWithdrawal);

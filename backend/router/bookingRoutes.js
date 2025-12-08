@@ -21,20 +21,20 @@ import {
   cancelBooking,
 } from '../controller/bookingController.js';
 
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect, admin, staff } from '../middleware/authMiddleware.js';
 import { protectWorker } from '../middleware/workerAuthMiddleware.js';
 
 const router = express.Router();
 
-// Admin Routes
-router.get('/admin/all', protect, admin, getBookings);
+// Admin Routes (Accessible by Staff)
+router.get('/admin/all', protect, staff, getBookings);
 
 // User Routes
 router.post('/', protect, createBooking);
 router.post('/bulk', protect, createBulkBookings);
 router.get('/my', protect, getUserBookings);
 router.get('/:id', protect, getBookingById);
-router.put('/:id/assign', protect, admin, assignWorker);
+router.put('/:id/assign', protect, staff, assignWorker);
 router.put('/:id/cancel', protect, cancelBooking);
 
 // Worker Routes

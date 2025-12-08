@@ -105,9 +105,7 @@ const EditProfileScreen = ({ navigation }) => {
                     <View style={[styles.avatar, { backgroundColor: isDark ? '#374151' : '#DBEAFE' }]}>
                         <Ionicons name="person" size={50} color={colors.primary} />
                     </View>
-                    <TouchableOpacity style={styles.changePhotoButton}>
-                        <Text style={[styles.changePhotoText, { color: colors.primary }]}>Change Photo</Text>
-                    </TouchableOpacity>
+
                 </View>
 
                 <View style={[styles.form, { backgroundColor: colors.card }]}>

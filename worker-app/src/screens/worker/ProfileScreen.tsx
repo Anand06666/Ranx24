@@ -50,7 +50,7 @@ const ProfileScreen = ({ navigation }: any) => {
                         {worker?.livePhoto ? (
                             <Image
                                 source={{
-                                    uri: `${API_URL.replace('/api', '')}/${worker.livePhoto}`,
+                                    uri: `${API_URL.replace('/api', '')}/uploads/${worker.livePhoto}`,
                                 }}
                                 style={[styles.profileImage, imageLoading && { display: 'none' }]}
                                 onLoadEnd={() => setImageLoading(false)}
@@ -164,10 +164,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 </View>
 
                 {/* Action Buttons */}
-                <TouchableOpacity style={styles.editButton}>
-                    <Ionicons name="create-outline" size={20} color="white" />
-                    <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
+
 
                 <TouchableOpacity
                     style={styles.supportButton}

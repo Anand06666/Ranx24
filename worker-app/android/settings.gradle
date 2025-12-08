@@ -31,7 +31,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 expoAutolinking.useExpoModules()
 
-rootProject.name = 'Worker App'
+rootProject.name = 'RanX24 Service Partner'
 
 expoAutolinking.useExpoVersionCatalog()
 

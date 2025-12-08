@@ -31,9 +31,18 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Token expired or invalid
+            const userType = localStorage.getItem('userType');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            localStorage.removeItem('userType');
+
+            if (userType === 'admin' || userType === 'employee' || userType === 'superadmin') {
+                window.location.href = '/admin-login';
+            } else if (userType === 'worker') {
+                window.location.href = '/worker-login';
+            } else {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

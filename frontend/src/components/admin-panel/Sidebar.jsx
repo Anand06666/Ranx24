@@ -23,6 +23,8 @@ import {
 import logo from '../../assets/images/logo.png';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user.role;
 
   const NavItem = ({ to, label, icon: Icon, end = false }) => (
     <NavLink
@@ -97,17 +99,27 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           <NavItem to="/admin-dashboard/categories" label="Categories" icon={Tag} />
           <NavItem to="/admin-dashboard/services" label="Services" icon={Briefcase} />
           <NavItem to="/admin-dashboard/cities" label="Cities" icon={MapPin} />
-          <NavItem to="/admin-dashboard/withdrawals" label="Withdrawals" icon={Wallet} />
 
-          <SectionLabel label="Marketing & Finance" />
-          <NavItem to="/admin-dashboard/banners" label="Banners" icon={ImageIcon} />
-          <NavItem to="/admin-dashboard/coupons" label="Coupons" icon={Percent} />
-          <NavItem to="/admin-dashboard/coins" label="Coins Config" icon={Coins} />
-          <NavItem to="/admin-dashboard/fees" label="Fees Config" icon={CreditCard} />
+          {userRole !== 'employee' && (
+            <NavItem to="/admin-dashboard/withdrawals" label="Withdrawals" icon={Wallet} />
+          )}
+
+          {userRole !== 'employee' && (
+            <>
+              <SectionLabel label="Marketing & Finance" />
+              <NavItem to="/admin-dashboard/finance" label="Finance" icon={Wallet} />
+              <NavItem to="/admin-dashboard/banners" label="Banners" icon={ImageIcon} />
+              <NavItem to="/admin-dashboard/coupons" label="Coupons" icon={Percent} />
+              <NavItem to="/admin-dashboard/coins" label="Coins Config" icon={Coins} />
+              <NavItem to="/admin-dashboard/fees" label="Fees Config" icon={CreditCard} />
+
+              <SectionLabel label="Staff" />
+              <NavItem to="/admin-dashboard/employees" label="Employees" icon={Users} />
+            </>
+          )}
 
           <SectionLabel label="Support" />
           <NavItem to="/admin-dashboard/help" label="Help & Support" icon={LifeBuoy} />
-
         </nav>
       </aside>
 

@@ -93,10 +93,7 @@ const BookingDetailsScreen = () => {
                 text2: 'Ask customer for start OTP',
             });
             // For testing
-            if (response.data.otp) {
-                console.log('Start OTP:', response.data.otp);
-                Alert.alert('Demo OTP', `Start OTP: ${response.data.otp}`);
-            }
+
         } catch (error: any) {
             Toast.show({
                 type: 'error',
@@ -283,10 +280,7 @@ const BookingDetailsScreen = () => {
                 text2: 'Ask customer for completion OTP',
             });
             // For testing, if OTP is returned (it is in my backend code for now)
-            if (response.data.otp) {
-                console.log('Completion OTP:', response.data.otp);
-                Alert.alert('Demo OTP', `Completion OTP: ${response.data.otp}`);
-            }
+
         } catch (error: any) {
             Toast.show({
                 type: 'error',
@@ -612,7 +606,7 @@ const BookingDetailsScreen = () => {
 
             {/* Action Buttons */}
             <View style={styles.footer}>
-                {booking.status === 'pending' && (
+                {(booking.status === 'pending' || booking.status === 'assigned') && (
                     <View style={styles.actionRow}>
                         <TouchableOpacity
                             style={[styles.actionButton, styles.rejectButton]}

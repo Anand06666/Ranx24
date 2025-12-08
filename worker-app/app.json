@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "RanX24 Worker",
-    "slug": "ranx24-worker",
+    "name": "RanX24 Service Partner",
+    "slug": "ranx24-service-partner",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1E40AF"
       },
-      "package": "com.ranx24.worker",
+      "package": "com.RanX24.Worker",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "CAMERA",
@@ -34,7 +34,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-image-picker",

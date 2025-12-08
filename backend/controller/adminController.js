@@ -63,6 +63,13 @@ export const getDashboardStats = async (req, res) => {
       { $group: { _id: null, total: { $sum: '$balance' } } }
     ]))[0]?.total || 0;
 
+    // Pending Payments (Completed bookings that are not paid)
+    const pendingPaymentsAgg = await Booking.aggregate([
+      { $match: { status: 'completed', paymentStatus: { $ne: 'paid' } } },
+      { $group: { _id: null, total: { $sum: '$finalPrice' } } }
+    ]);
+    const pendingPayments = pendingPaymentsAgg.length > 0 ? pendingPaymentsAgg[0].total : 0;
+
     // 5. Review Stats
     const reviewStats = await Review.aggregate([
       {
@@ -80,30 +87,38 @@ export const getDashboardStats = async (req, res) => {
     const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
     const reviewsWeek = await Review.countDocuments({ createdAt: { $gte: startOfWeek } });
 
-    res.json({
+    const response = {
       users: userCount,
       workers: workerCount,
       workersPending: pendingWorkers,
       verifiedWorkers: verifiedWorkers,
       bookings: bookingCount,
-      earnings,
-      // New stats
-      activeServices: 0, // Frontend calculates this from categories
-      availableCities: 0, // Frontend calculates this from cities
+      // Shared stats
       completedBookings,
       bookingsToday,
       bookingsMonth,
-      wallet: {
-        totalIn,
-        totalOut,
-        available: availableWallet
-      },
+      // Placeholders
+      activeServices: 0,
+      availableCities: 0,
       reviews: {
         average: avgRating,
         total: totalReviews,
         week: reviewsWeek
       }
-    });
+    };
+
+    // Only add Financial Stats if NOT employee
+    if (req.user.role !== 'employee') {
+      response.earnings = earnings;
+      response.wallet = {
+        totalIn,
+        totalOut,
+        available: availableWallet,
+        pending: pendingPayments
+      };
+    }
+
+    res.json(response);
   } catch (error) {
     console.error("Stats Error:", error);
     res.status(500).json({ message: 'Server Error' });
@@ -187,22 +202,19 @@ export const adminLogin = async (req, res) => {
   try {
     // Find admin by mobile number
     const admin = await Admin.findOne({ mobileNumber });
-    console.log('Admin Login Attempt:', { mobileNumber, password });
 
     // Check if admin exists
     if (!admin) {
-      console.log('Admin not found in DB');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Compare passwords (NOTE: In a real application, use bcrypt for password hashing and comparison)
     if (admin.password !== password) {
-      console.log('Password mismatch. DB:', admin.password, 'Input:', password);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Generate Token
-    const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ id: admin._id, role: admin.role || 'admin' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     // If credentials are valid
     res.status(200).json({
@@ -212,7 +224,8 @@ export const adminLogin = async (req, res) => {
       user: {
         _id: admin._id,
         mobileNumber: admin.mobileNumber,
-        role: 'admin'
+        name: admin.name,
+        role: admin.role || 'superadmin' // Default to superadmin for backward compatibility
       }
     });
 
@@ -301,5 +314,68 @@ export const rejectWithdrawal = async (req, res) => {
   } catch (error) {
     console.error('Error rejecting withdrawal:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Create new Employee (Restricted Admin)
+// @route   POST /api/admin/employees
+// @access  Private (Super Admin)
+export const createEmployee = async (req, res) => {
+  try {
+    const { name, mobileNumber, password } = req.body;
+
+    // Check if admin exists
+    const existingAdmin = await Admin.findOne({ mobileNumber });
+    if (existingAdmin) {
+      return res.status(400).json({ message: 'Admin/Employee already exists with this number' });
+    }
+
+    const employee = await Admin.create({
+      name,
+      mobileNumber,
+      password, // Note: In production use hashing!
+      role: 'employee'
+    });
+
+    res.status(201).json({ message: 'Employee created successfully', employee });
+  } catch (error) {
+    console.error('Error creating employee:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc    Get all employees
+// @route   GET /api/admin/employees
+// @access  Private (Super Admin)
+export const getEmployees = async (req, res) => {
+  try {
+    const employees = await Admin.find({ role: 'employee' }).select('-password');
+    res.json(employees);
+  } catch (error) {
+    console.error('Error fetching employees:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// @desc    Delete employee
+// @route   DELETE /api/admin/employees/:id
+// @access  Private (Super Admin)
+export const deleteEmployee = async (req, res) => {
+  try {
+    const employee = await Admin.findById(req.params.id);
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    if (employee.role !== 'employee') {
+      return res.status(400).json({ message: 'Cannot delete super admin' });
+    }
+
+    await employee.deleteOne();
+    res.json({ message: 'Employee removed' });
+  } catch (error) {
+    console.error('Error deleting employee:', error);
+    res.status(500).json({ message: 'Server Error' });
   }
 };

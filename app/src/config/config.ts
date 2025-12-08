@@ -11,10 +11,8 @@ const getApiUrl = () => {
 
     // Development fallback
     if (__DEV__) {
-        // Use LAN IP for reliable connection on Physical Device & Emulator
-        return Platform.OS === 'android'
-            ? 'https://backend.ranx24.com/api'
-            : 'https://backend.ranx24.com/api';
+        // User requested to use Production API even in development
+        return 'https://backend.ranx24.com/api';
     }
 
     // Production fallback (should not reach here if env vars are set)

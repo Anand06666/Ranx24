@@ -7,7 +7,7 @@ import {
     updateTicketStatus,
     markAsRead,
 } from '../controller/supportController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { protect, staff } from '../middleware/authMiddleware.js';
 import validate from '../middleware/validateMiddleware.js';
 import { supportTicketSchema } from '../utils/validationSchemas.js';
 
@@ -21,9 +21,9 @@ router.post('/', validate(supportTicketSchema), createTicket);
 router.get('/my', getUserTickets);
 router.post('/:id/message', addMessage);
 
-// Admin routes
-router.get('/admin/all', getAllTickets);
-router.patch('/:id/status', updateTicketStatus);
-router.patch('/:id/read', markAsRead);
+// Admin routes (Accessible by Staff)
+router.get('/admin/all', staff, getAllTickets);
+router.patch('/:id/status', staff, updateTicketStatus);
+router.patch('/:id/read', staff, markAsRead);
 
 export default router;

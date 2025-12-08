@@ -12,7 +12,7 @@ export default function Navbar() {
   const location = useLocation();
   const { cartItems } = useCart();
   const { isAuthenticated, logout, user } = useAuth();
-  const { location: userLocation, detectLocation } = useUserLocation();
+  const { location: userLocation, detectLocation, availableCities, updateCity } = useUserLocation();
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -68,16 +68,42 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Location Pill */}
-            <button
-              onClick={detectLocation}
-              className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-sm text-gray-700"
-            >
-              <LucideMapPin size={14} className="text-blue-600" />
-              <span className="max-w-[100px] truncate">
-                {userLocation.loading ? 'Locating...' : userLocation.city || 'Set Location'}
-              </span>
-            </button>
+            {/* Location Pill / City Selector */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-sm text-gray-700"
+              >
+                <LucideMapPin size={14} className="text-blue-600" />
+                <span className="max-w-[100px] truncate">
+                  {userLocation.loading ? 'Locating...' : userLocation.city || 'Select City'}
+                </span>
+                <LucideChevronDown size={12} className="text-gray-400" />
+              </button>
+
+              {/* City Dropdown */}
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl py-2 border border-gray-100 hidden group-hover:block transform origin-top-left transition-all z-50">
+                <div className="px-3 py-2 border-b border-gray-50 flex justify-between items-center">
+                  <span className="text-xs font-semibold text-gray-500">Select City</span>
+                  <button onClick={detectLocation} className="text-xs text-blue-600 hover:underline">Detect</button>
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  {availableCities?.length > 0 ? (
+                    availableCities.map((city) => (
+                      <button
+                        key={city._id}
+                        onClick={() => updateCity(city.name)}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600 flex justify-between items-center ${userLocation.city === city.name ? 'text-blue-600 font-medium bg-blue-50' : 'text-gray-700'}`}
+                      >
+                        {city.name}
+                        {userLocation.city === city.name && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-xs text-gray-400">Loading cities...</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right Actions */}

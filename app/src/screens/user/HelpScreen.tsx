@@ -35,7 +35,7 @@ const HelpScreen = ({ navigation }) => {
     ];
 
     const handleCall = () => {
-        Linking.openURL('tel:+911234567890');
+        Linking.openURL('tel:+919546806196');
     };
 
     const handleEmail = () => {
@@ -63,7 +63,7 @@ const HelpScreen = ({ navigation }) => {
                             </View>
                             <View>
                                 <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Call Us</Text>
-                                <Text style={[styles.contactValue, { color: colors.text }]}>+91 123 456 7890</Text>
+                                <Text style={[styles.contactValue, { color: colors.text }]}>+91 9546806196</Text>
                             </View>
                         </View>
                         <Ionicons name="chevron-forward" size={20} color={colors.textLight} />

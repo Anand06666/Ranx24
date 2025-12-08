@@ -1243,7 +1243,7 @@ export const requestStartOtp = async (req, res) => {
       data: { bookingId: booking._id, otp: otp }
     });
 
-    res.json({ message: 'OTP sent to customer', otp }); // Sending OTP in response for testing/demo
+    res.json({ message: 'OTP sent to customer' });
   } catch (error) {
     console.error('Error requesting start OTP:', error);
     res.status(500).json({ message: 'Server error' });
@@ -1370,7 +1370,7 @@ export const requestCompletionOtp = async (req, res) => {
       }
     });
 
-    res.json({ message: 'OTP sent to customer', otp: otp }); // Sending OTP to worker for testing/demo purposes
+    res.json({ message: 'OTP sent to customer' });
   } catch (error) {
     console.error('Error requesting completion OTP:', error);
     res.status(500).json({ message: 'Server error while requesting OTP' });
@@ -1416,6 +1416,35 @@ export const completeBooking = async (req, res) => {
     booking.completeJobOTP = undefined; // Clear OTP
     // Payment status remains pending until collected (unless already paid)
     const updatedBooking = await booking.save();
+
+    // Credit Worker Wallet if payment is online (i.e., held by platform)
+    if (booking.paymentMethod !== 'cash') {
+      try {
+        let wallet = await WorkerWallet.findOne({ worker: req.user._id });
+        if (!wallet) {
+          wallet = new WorkerWallet({
+            worker: req.user._id,
+            balance: 0,
+            transactions: []
+          });
+        }
+
+        wallet.balance += booking.finalPrice;
+        wallet.transactions.push({
+          type: 'credit',
+          amount: booking.finalPrice,
+          description: `Earnings for ${booking.service}`,
+          bookingId: booking._id,
+          date: new Date()
+        });
+
+        await wallet.save();
+        console.log(`Credited ₹${booking.finalPrice} to worker ${req.user._id} wallet.`);
+      } catch (walletError) {
+        console.error('Error crediting worker wallet:', walletError);
+        // Don't fail the request, just log error
+      }
+    }
 
     // FAILSAFE: If payment is 'paid', ensure wallet is credited
     if (booking.paymentStatus === 'paid') {
@@ -1818,8 +1847,8 @@ export const assignWorker = async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    // Allow re-assignment if status is 'pending' OR 'assigned'
-    if (booking.status !== 'pending' && booking.status !== 'assigned') {
+    // Allow re-assignment if status is 'pending', 'assigned' OR 'rejected'
+    if (booking.status !== 'pending' && booking.status !== 'assigned' && booking.status !== 'rejected') {
       return res.status(400).json({ message: `Booking is already ${booking.status}` });
     }
 

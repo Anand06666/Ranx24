@@ -10,9 +10,9 @@ import cacheService, { cacheKeys, cacheTTL } from '../utils/cacheService.js';
 // @access  Public
 export const getCategories = async (req, res) => {
   try {
-    const { latitude, longitude, maxDistance, city: cityName } = req.query;
+    const { city: cityName } = req.query;
 
-    // 1. Priority: Admin Assignments by City
+    // 1. Filter by Admin Assignments (City)
     if (cityName) {
       const cityConfig = await City.findOne({ name: { $regex: new RegExp(`^${cityName}$`, 'i') } });
 
@@ -24,61 +24,13 @@ export const getCategories = async (req, res) => {
         });
 
         return res.json(categories);
+      } else if (cityConfig) {
+        // City exists but no categories assigned -> Return empty
+        return res.json([]);
       }
     }
 
-    // 2. Fallback: Filter by available workers (Geo or City Name match)
-    if ((latitude && longitude) || cityName) {
-
-      const promises = [];
-
-      // Find workers by Geo
-      if (latitude && longitude) {
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
-        const distance = maxDistance ? Number(maxDistance) * 1000 : 50000; // Default 50km
-
-        promises.push(Worker.aggregate([
-          {
-            $geoNear: {
-              near: { type: 'Point', coordinates: [lng, lat] },
-              distanceField: 'distance',
-              maxDistance: distance,
-              query: { status: 'approved', isAvailable: true }, // Only active workers
-              spherical: true
-            }
-          },
-          { $unwind: '$categories' }, // Unwind categories array
-          {
-            $group: {
-              _id: '$categories', // Group by category name
-              workerCount: { $sum: 1 },
-            }
-          }
-        ]).then(res => res.map(r => r._id)));
-      }
-
-      // Find workers by City (if city config didn't exist above)
-      if (cityName) {
-        promises.push(Worker.find({
-          city: { $regex: new RegExp(`^${cityName}$`, 'i') },
-          status: 'approved',
-          isAvailable: true
-        }).select('categories').then(workers => [...new Set(workers.flatMap(w => w.categories))]));
-      }
-
-      const results = await Promise.all(promises);
-      let availableCategoryNames = [...new Set(results.flat())];
-
-      // Fetch full category details for these names
-      const categories = await Category.find({
-        name: { $in: availableCategoryNames }
-      });
-
-      return res.json(categories);
-    }
-
-    // Default: Return all categories if no location provided
+    // Default: Return all categories if no city provided
     // Try to get from cache
     const categories = await cacheService.wrap(
       cacheKeys.categories(),
@@ -208,7 +160,7 @@ export const getCategoryById = async (req, res) => {
       return res.status(404).json({ message: 'Category not found' });
     }
 
-    const { latitude, longitude, maxDistance, city: cityName } = req.query;
+    const { city: cityName } = req.query;
 
     // 1. Priority: Admin Assignments by City
     if (cityName) {
@@ -228,64 +180,6 @@ export const getCategoryById = async (req, res) => {
           return res.json(categoryObj);
         }
       }
-    }
-
-    // 2. Fallback: Filter by available workers
-    if ((latitude && longitude) || cityName) {
-
-      const promises = [];
-
-      // Find workers by Geo
-      if (latitude && longitude) {
-        const lat = parseFloat(latitude);
-        const lng = parseFloat(longitude);
-        const distance = maxDistance ? Number(maxDistance) * 1000 : 50000; // Default 50km
-
-        promises.push(Worker.aggregate([
-          {
-            $geoNear: {
-              near: { type: 'Point', coordinates: [lng, lat] },
-              distanceField: 'distance',
-              maxDistance: distance,
-              query: {
-                status: 'approved',
-                isAvailable: true,
-                categories: category.name // Filter by this category
-              },
-              spherical: true
-            }
-          },
-          { $unwind: '$services' }, // Unwind services array
-          {
-            $group: {
-              _id: '$services', // Group by service name (subcategory)
-            }
-          }
-        ]).then(res => res.map(r => r._id)));
-      }
-
-      // Find workers by City
-      if (cityName) {
-        promises.push(Worker.find({
-          city: { $regex: new RegExp(`^${cityName}$`, 'i') },
-          status: 'approved',
-          isAvailable: true,
-          categories: category.name
-        }).select('services').then(workers => [...new Set(workers.flatMap(w => w.services))]));
-      }
-
-      const results = await Promise.all(promises);
-      let availableServices = [...new Set(results.flat())];
-
-      // Filter category.subCategories
-      const filteredSubCategories = category.subCategories.filter(sub =>
-        availableServices.includes(sub.name)
-      );
-
-      // Return category with filtered subcategories
-      const categoryObj = category.toObject();
-      categoryObj.subCategories = filteredSubCategories;
-      return res.json(categoryObj);
     }
 
     res.json(category);

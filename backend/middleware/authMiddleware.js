@@ -32,9 +32,9 @@ export const protect = async (req, res, next) => {
       let user = null;
 
       // Check role and fetch user from appropriate model
-      if (decoded.role === 'admin') {
+      if (['admin', 'superadmin', 'employee'].includes(decoded.role)) {
         user = await Admin.findById(decoded.id);
-        if (user) user.role = 'admin'; // Ensure role is set
+        if (user) user.role = decoded.role; // Keep the role from token or DB
       } else if (decoded.role === 'worker') {
         user = await Worker.findById(decoded.id);
         if (user) user.role = 'worker';
@@ -49,7 +49,8 @@ export const protect = async (req, res, next) => {
       }
 
       req.user = user;
-      req.user.isAdmin = user.role === 'admin';
+      req.user.isAdmin = ['admin', 'superadmin'].includes(user.role);
+      req.user.isEmployee = user.role === 'employee';
       return next();
     }
 
@@ -61,9 +62,17 @@ export const protect = async (req, res, next) => {
 };
 
 export const admin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
+  if (req.user && ['admin', 'superadmin'].includes(req.user.role)) {
     next();
   } else {
     res.status(401).json({ message: 'Not authorized as an admin' });
+  }
+};
+
+export const staff = (req, res, next) => {
+  if (req.user && ['admin', 'superadmin', 'employee'].includes(req.user.role)) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as staff' });
   }
 };

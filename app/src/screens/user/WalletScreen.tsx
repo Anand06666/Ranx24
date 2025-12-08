@@ -13,6 +13,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import RazorpayCheckout from 'react-native-razorpay';
+import { RAZORPAY_KEY_ID } from '../../config/config';
+import {
+    Modal,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    TouchableWithoutFeedback,
+    Keyboard,
+    ActivityIndicator
+} from 'react-native';
 import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -31,6 +42,11 @@ const WalletScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
+    // Add Money State
+    const [addMoneyModalVisible, setAddMoneyModalVisible] = useState(false);
+    const [amountToAdd, setAmountToAdd] = useState('');
+    const [addingMoney, setAddingMoney] = useState(false);
+
     useFocusEffect(
         useCallback(() => {
             fetchWalletData();
@@ -38,35 +54,114 @@ const WalletScreen = ({ navigation }) => {
     );
 
     const fetchWalletData = async () => {
+        setRefreshing(true);
         try {
-            const [walletRes, coinsRes, transactionsRes] = await Promise.all([
-                api.get('/wallet/'),
-                api.get('/coins/my-balance'),
-                api.get('/wallet/transactions'),
-            ]);
+            // 1. Fetch Wallet Balance
+            try {
+                const walletRes = await api.get('/wallet/');
+                setWalletData(prev => ({
+                    ...prev,
+                    balance: walletRes.data.balance || 0,
+                    ycCoins: walletRes.data.ycCoins || 0,
+                }));
+            } catch (error) {
+                console.error('Fetch Wallet Error:', error);
+                // Don't show toast here to avoid spamming if multiple fail
+            }
 
-            setWalletData({
-                balance: walletRes.data.balance || 0,
-                ycCoins: walletRes.data.ycCoins || 0,
-            });
+            // 2. Fetch Coins Details
+            try {
+                const coinsRes = await api.get('/coins/my-balance');
+                setCoinData({
+                    balance: coinsRes.data.balance || 0,
+                    totalEarned: coinsRes.data.totalEarned || 0,
+                    totalSpent: coinsRes.data.totalSpent || 0,
+                });
+            } catch (error) {
+                console.error('Fetch Coins Error:', error);
+            }
 
-            setCoinData({
-                balance: coinsRes.data.balance || 0,
-                totalEarned: coinsRes.data.totalEarned || 0,
-                totalSpent: coinsRes.data.totalSpent || 0,
-            });
+            // 3. Fetch Transactions
+            try {
+                const transactionsRes = await api.get('/wallet/transactions');
+                setTransactions(transactionsRes.data || []);
+            } catch (error) {
+                console.error('Fetch Transactions Error:', error);
+            }
 
-            setTransactions(transactionsRes.data || []);
         } catch (error) {
-            console.error('Error fetching wallet data:', error);
+            console.error('General Fetch Error:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Failed to load wallet data',
+                text2: 'Some data failed to load',
             });
         } finally {
             setLoading(false);
             setRefreshing(false);
+        }
+    };
+
+
+    const handleAddMoney = async () => {
+        const amount = parseFloat(amountToAdd);
+        if (!amount || isNaN(amount) || amount <= 0) {
+            Toast.show({ type: 'error', text1: 'Invalid Amount', text2: 'Please enter a valid amount' });
+            return;
+        }
+
+        setAddingMoney(true);
+        try {
+            // 1. Create Order
+            const orderResponse = await api.post('/payment/order', { amount });
+            const { id: order_id, currency, amount: razorpayAmount } = orderResponse.data;
+
+            const options = {
+                description: 'Wallet Top-up',
+                image: 'https://cdn-icons-png.flaticon.com/512/12145/12145443.png', // App Logo
+                currency: currency,
+                key: RAZORPAY_KEY_ID,
+                amount: razorpayAmount,
+                name: 'RanX24',
+                order_id: order_id,
+                prefill: { contact: '9876543210', email: 'user@example.com' }, // Should use actual user details
+                theme: { color: colors.primary }
+            };
+
+            // 2. Open Razorpay
+            RazorpayCheckout.open(options).then(async (data) => {
+                // 3. Verify Payment
+                try {
+                    const verifyResponse = await api.post('/payment/verify', {
+                        razorpay_order_id: data.razorpay_order_id,
+                        razorpay_payment_id: data.razorpay_payment_id,
+                        razorpay_signature: data.razorpay_signature,
+                        isWalletTopUp: true,
+                        amount: amount
+                    });
+
+                    if (verifyResponse.data.success) {
+                        Toast.show({ type: 'success', text1: 'Success', text2: 'Money added to wallet successfully' });
+                        setAddMoneyModalVisible(false);
+                        setAmountToAdd('');
+                        fetchWalletData(); // Refresh balance
+                    } else {
+                        Toast.show({ type: 'error', text1: 'Verification Failed', text2: 'Payment verification failed' });
+                    }
+                } catch (verifyError) {
+                    console.error('Wallet verify error:', verifyError);
+                    Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to verify payment' });
+                }
+            }).catch((error) => {
+                console.log('Razorpay Error:', error);
+                Toast.show({ type: 'error', text1: 'Payment Cancelled', text2: 'Payment was cancelled or failed' });
+            });
+
+        } catch (error) {
+            console.error('Add Money Error:', error);
+            Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to initiate payment' });
+        } finally {
+            setAddingMoney(false);
         }
     };
 
@@ -176,7 +271,7 @@ const WalletScreen = ({ navigation }) => {
                     <View style={styles.balanceActions}>
                         <TouchableOpacity
                             style={styles.balanceButton}
-                            onPress={() => Toast.show({ type: 'info', text1: 'Coming Soon', text2: 'This feature is under development' })}
+                            onPress={() => setAddMoneyModalVisible(true)}
                         >
                             <Ionicons name="add-circle-outline" size={20} color="white" />
                             <Text style={styles.balanceButtonText}>Add Money</Text>
@@ -230,6 +325,67 @@ const WalletScreen = ({ navigation }) => {
                     )}
                 </View>
             </ScrollView>
+
+            {/* Add Money Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={addMoneyModalVisible}
+                onRequestClose={() => setAddMoneyModalVisible(false)}
+            >
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    <View style={styles.modalOverlay}>
+                        <KeyboardAvoidingView
+                            behavior={Platform.OS === "ios" ? "padding" : "height"}
+                            style={[styles.modalContent, { backgroundColor: colors.card }]}
+                        >
+                            <View style={styles.modalHeader}>
+                                <Text style={[styles.modalTitle, { color: colors.text }]}>Add Money to Wallet</Text>
+                                <TouchableOpacity onPress={() => setAddMoneyModalVisible(false)}>
+                                    <Ionicons name="close" size={24} color={colors.text} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.amountInputContainer}>
+                                <Text style={[styles.currencySymbol, { color: colors.text }]}>₹</Text>
+                                <TextInput
+                                    style={[styles.amountInput, { color: colors.text }]}
+                                    value={amountToAdd}
+                                    onChangeText={setAmountToAdd}
+                                    placeholder="0"
+                                    placeholderTextColor={colors.textLight}
+                                    keyboardType="numeric"
+                                    autoFocus
+                                />
+                            </View>
+
+                            <View style={styles.quickAmountContainer}>
+                                {[100, 200, 500, 1000].map((amount) => (
+                                    <TouchableOpacity
+                                        key={amount}
+                                        style={[styles.quickAmountBtn, { borderColor: colors.border }]}
+                                        onPress={() => setAmountToAdd(amount.toString())}
+                                    >
+                                        <Text style={[styles.quickAmountText, { color: colors.text }]}>+₹{amount}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+
+                            <TouchableOpacity
+                                style={[styles.payNowBtn, { backgroundColor: colors.primary }, addingMoney && { opacity: 0.7 }]}
+                                onPress={handleAddMoney}
+                                disabled={addingMoney}
+                            >
+                                {addingMoney ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={styles.payNowText}>Proceed to Pay</Text>
+                                )}
+                            </TouchableOpacity>
+                        </KeyboardAvoidingView>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -411,6 +567,72 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: 16,
         marginTop: 16,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 24,
+        paddingBottom: 40,
+        minHeight: 300,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    amountInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        paddingBottom: 8,
+    },
+    currencySymbol: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        marginRight: 8,
+    },
+    amountInput: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        minWidth: 100,
+        textAlign: 'center',
+    },
+    quickAmountContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 24,
+    },
+    quickAmountBtn: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+    },
+    quickAmountText: {
+        fontWeight: '600',
+    },
+    payNowBtn: {
+        padding: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    payNowText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

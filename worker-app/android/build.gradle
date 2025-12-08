@@ -13,10 +13,6 @@ buildscript {
   }
 }
 
-ext {
-    ndkVersion = "26.1.10909125"
-}
-
 allprojects {
   repositories {
     google()

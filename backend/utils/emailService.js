@@ -248,7 +248,7 @@ class EmailService {
      * Send password reset email
      */
     async sendPasswordReset(user, resetToken) {
-        const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+        const resetUrl = `${process.env.CLIENT_URL || 'https://www.ranx24.com'}/reset-password/${resetToken}`;
 
         return this.sendEmail({
             to: user.email,
@@ -272,7 +272,7 @@ class EmailService {
             template: 'welcome',
             data: {
                 userName: user.name || 'User',
-                loginUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+                loginUrl: process.env.CLIENT_URL || 'https://www.ranx24.com',
             }
         });
     }

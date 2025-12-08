@@ -9,6 +9,8 @@ const BookingManagement = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // 'all', 'pending', 'scheduled', 'completed'
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user.role;
 
   // Worker Assignment State
   const [workers, setWorkers] = useState([]);
@@ -76,6 +78,7 @@ const BookingManagement = () => {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
+      case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -94,6 +97,7 @@ const BookingManagement = () => {
           <button onClick={() => setFilter('all')} className={`px-4 py-2 text-sm font-medium cursor-pointer ${filter === 'all' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>All</button>
           <button onClick={() => setFilter('pending')} className={`px-4 py-2 text-sm font-medium cursor-pointer ${filter === 'pending' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Pending</button>
           <button onClick={() => setFilter('assigned')} className={`px-4 py-2 text-sm font-medium cursor-pointer ${filter === 'assigned' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Assigned</button>
+          <button onClick={() => setFilter('rejected')} className={`px-4 py-2 text-sm font-medium cursor-pointer ${filter === 'rejected' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Rejected</button>
           <button onClick={() => setFilter('completed')} className={`px-4 py-2 text-sm font-medium cursor-pointer ${filter === 'completed' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'}`}>Completed</button>
         </div>
       </div>
@@ -105,7 +109,7 @@ const BookingManagement = () => {
               <th className="px-4 py-3 font-bold text-blue-700 text-left">Booking ID</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-left">User</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-left">Service</th>
-              <th className="px-4 py-3 font-bold text-blue-700 text-left">Amount</th>
+              {userRole !== 'employee' && <th className="px-4 py-3 font-bold text-blue-700 text-left">Amount</th>}
               <th className="px-4 py-3 font-bold text-blue-700 text-left">Date</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-center">Status</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-center">Actions</th>
@@ -121,7 +125,9 @@ const BookingManagement = () => {
                     (typeof booking.user === 'string' ? booking.user : 'Unknown')}
                 </td>
                 <td className="px-4 py-3">{booking.service}</td>
-                <td className="px-4 py-3 font-semibold">₹{(booking.finalPrice || booking.totalPrice || 0).toLocaleString('en-IN')}</td>
+                {userRole !== 'employee' && (
+                  <td className="px-4 py-3 font-semibold">₹{(booking.finalPrice || booking.totalPrice || 0).toLocaleString('en-IN')}</td>
+                )}
                 <td className="px-4 py-3">{new Date(booking.bookingDate || booking.createdAt).toLocaleDateString()}</td>
                 <td className="px-4 py-3 text-center">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
@@ -147,6 +153,19 @@ const BookingManagement = () => {
                       <button
                         onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
                         className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600 transition"
+                      >
+                        Re-assign
+                      </button>
+                    </div>
+                  )}
+                  {booking.status === 'rejected' && (
+                    <div className="flex flex-col items-center gap-1">
+                      <span className="text-xs text-red-500">
+                        Rejected by: {booking.worker?.name || 'Worker'}
+                      </span>
+                      <button
+                        onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition"
                       >
                         Re-assign
                       </button>

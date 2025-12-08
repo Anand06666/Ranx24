@@ -19,24 +19,9 @@ import api from '../../services/api';
 const ProfileScreen = ({ navigation }: any) => {
     const { user, logout } = useAuth();
     const { colors, isDark } = useTheme();
-    const [wallet, setWallet] = React.useState<any>(null);
-    const [loading, setLoading] = React.useState(false);
 
-    React.useEffect(() => {
-        fetchWallet();
-    }, []);
 
-    const fetchWallet = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get('/wallet');
-            setWallet(response.data);
-        } catch (error) {
-            console.log('Error fetching wallet:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     const menuItems = [
         { icon: 'person-outline', label: 'Edit Profile', screen: 'EditProfile', color: '#3B82F6' },
@@ -102,28 +87,7 @@ const ProfileScreen = ({ navigation }: any) => {
                     </View>
                 </View>
 
-                {/* Wallet Card */}
-                <View style={[styles.walletCard, { backgroundColor: colors.primary }]}>
-                    <View style={styles.walletHeader}>
-                        <View>
-                            <Text style={styles.walletLabel}>Total Balance</Text>
-                            <Text style={styles.walletAmount}>₹{wallet?.balance || '0.00'}</Text>
-                        </View>
-                        <View style={styles.walletIcon}>
-                            <Ionicons name="wallet" size={20} color="#FFF" />
-                        </View>
-                    </View>
-                    <View style={styles.walletActions}>
-                        <TouchableOpacity style={styles.walletBtn} onPress={() => navigation.navigate('Wallet')}>
-                            <Ionicons name="add-circle-outline" size={20} color="#FFF" />
-                            <Text style={styles.walletBtnText}>Add Money</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.walletBtn} onPress={() => navigation.navigate('Wallet')}>
-                            <Ionicons name="time-outline" size={20} color="#FFF" />
-                            <Text style={styles.walletBtnText}>History</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
+
 
                 {/* Menu */}
                 <View style={styles.section}>

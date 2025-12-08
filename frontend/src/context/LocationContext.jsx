@@ -11,24 +11,56 @@ export const LocationProvider = ({ children }) => {
     const [location, setLocation] = useState({
         latitude: null,
         longitude: null,
-        city: null,
+        city: null, // Default to null
         state: null,
         loading: true,
         error: null,
     });
 
-    const updateCity = (city) => {
-        const newLocation = { ...location, city, loading: false, error: null };
-        setLocation(newLocation);
-        localStorage.setItem('userLocation', JSON.stringify(newLocation));
+    const [availableCities, setAvailableCities] = useState([]);
+
+    useEffect(() => {
+        fetchCities();
+    }, []);
+
+    const fetchCities = async () => {
+        try {
+            const { data } = await axiosInstance.get('/cities');
+            setAvailableCities(data);
+            return data;
+        } catch (error) {
+            console.error('Error fetching cities:', error);
+            return [];
+        }
     };
 
-    const detectLocation = () => {
+    const updateCity = (cityName) => {
+        const selectedCity = availableCities.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+        if (selectedCity) {
+            const newLocation = {
+                ...location,
+                city: selectedCity.name,
+                state: selectedCity.state || location.state,
+                loading: false,
+                error: null
+            };
+            setLocation(newLocation);
+            localStorage.setItem('userLocation', JSON.stringify(newLocation));
+        }
+    };
+
+    const detectLocation = async () => {
         setLocation(prev => ({ ...prev, loading: true, error: null }));
 
         if (!navigator.geolocation) {
             setLocation(prev => ({ ...prev, loading: false, error: 'Geolocation is not supported by your browser' }));
             return;
+        }
+
+        // Ensure cities are loaded
+        let cities = availableCities;
+        if (cities.length === 0) {
+            cities = await fetchCities();
         }
 
         navigator.geolocation.getCurrentPosition(
@@ -42,14 +74,24 @@ export const LocationProvider = ({ children }) => {
                     });
 
                     const address = data.address;
-                    const city = address.city || address.town || address.village || address.county;
-                    const state = address.state;
+                    const cityCandidate = address.city || address.town || address.village || address.county || '';
+
+                    let detectedCity = null;
+                    let detectedState = null;
+
+                    // Match against available cities
+                    const matchedCity = cities.find(c => c.name.toLowerCase() === cityCandidate.toLowerCase());
+
+                    if (matchedCity) {
+                        detectedCity = matchedCity.name;
+                        detectedState = matchedCity.state || address.state;
+                    }
 
                     const newLocation = {
                         latitude,
                         longitude,
-                        city,
-                        state,
+                        city: detectedCity,
+                        state: detectedState,
                         loading: false,
                         error: null,
                     };
@@ -75,10 +117,11 @@ export const LocationProvider = ({ children }) => {
         );
     };
 
-    // Load from local storage on mount
+    // Load from local storage on mount (but verify city validity?)
     useEffect(() => {
         const savedLocation = localStorage.getItem('userLocation');
         if (savedLocation) {
+            // We trust the saved location for now, or we could re-validate against city list
             setLocation({ ...JSON.parse(savedLocation), loading: false, error: null });
         } else {
             // Optional: Auto-detect on first load
@@ -88,7 +131,7 @@ export const LocationProvider = ({ children }) => {
     }, []);
 
     return (
-        <LocationContext.Provider value={{ location, detectLocation, updateCity }}>
+        <LocationContext.Provider value={{ location, availableCities, detectLocation, updateCity }}>
             {children}
         </LocationContext.Provider>
     );

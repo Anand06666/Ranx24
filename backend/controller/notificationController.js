@@ -19,6 +19,7 @@ export const createNotification = async ({ recipient, recipientModel, title, mes
             console.log(`Socket notification sent to notifications_${recipient}`);
         }
 
+
         // Send FCM Push Notification
         if (firebaseApp) {
             try {
@@ -43,6 +44,16 @@ export const createNotification = async ({ recipient, recipientModel, title, mes
                         notification: {
                             title,
                             body: message
+                        },
+                        android: {
+                            priority: 'high',
+                            notification: {
+                                channelId: 'default',
+                                sound: 'default',
+                                priority: 'high',
+                                defaultSound: true,
+                                defaultVibrateTimings: true
+                            }
                         },
                         data: {
                             ...stringData,
@@ -97,6 +108,13 @@ export const sendBroadcastNotification = async (req, res) => {
                     body: message,
                 },
                 tokens: tokens, // Multicast
+                android: {
+                    priority: 'high',
+                    notification: {
+                        channelId: 'default',
+                        sound: 'default'
+                    }
+                },
                 data: {
                     type: 'broadcast',
                     image: image || ''
@@ -108,6 +126,7 @@ export const sendBroadcastNotification = async (req, res) => {
             }
 
             const response = await firebaseApp.messaging().sendEachForMulticast(messagePayload);
+
             console.log(`✅ Broadcast sent: ${response.successCount} successes, ${response.failureCount} failures`);
         }
 
@@ -164,12 +183,16 @@ export const getNotifications = async (req, res) => {
 // @access  Private
 export const markAsRead = async (req, res) => {
     try {
+        console.log(`📩 markAsRead called for ID: ${req.params.id}`);
+        console.log(`👤 User attempting action: ${req.user?._id}`);
+
         const notification = await Notification.findOne({
             _id: req.params.id,
             recipient: req.user._id
         });
 
         if (!notification) {
+            console.log(`❌ Notification not found or unauthorized. ID: ${req.params.id}, User: ${req.user._id}`);
             return res.status(404).json({ message: 'Notification not found' });
         }
 
@@ -178,8 +201,11 @@ export const markAsRead = async (req, res) => {
 
         res.json(notification);
     } catch (error) {
-        console.error('markAsRead error:', error);
-        res.status(500).json({ message: 'Server error' });
+        console.error('❌ markAsRead error:', error);
+        console.error('Stack:', error.stack);
+        console.error('Params:', req.params);
+        console.error('User:', req.user);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 };
 

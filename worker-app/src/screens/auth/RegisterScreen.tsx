@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import api from '../../services/api';
+import api, { API_URL } from '../../services/api';
 import { theme } from '../../theme/theme';
 
 // Destructure for easier access
@@ -163,7 +163,8 @@ const RegisterScreen = ({ navigation }: any) => {
 
             // Use fetch instead of axios for better file upload support in React Native
             const token = ''; // No token needed for registration
-            const response = await fetch('http://192.168.1.8:5000/api/workers/register', {
+            console.log('Registration URL:', `${API_URL}/workers/register`);
+            const response = await fetch(`${API_URL}/workers/register`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

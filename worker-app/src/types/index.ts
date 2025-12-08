@@ -58,7 +58,7 @@ export interface Booking {
         state: string;
         pincode: string;
     };
-    status: 'pending' | 'accepted' | 'rejected' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
+    status: 'pending' | 'assigned' | 'accepted' | 'rejected' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled';
     totalAmount: number;
     finalPrice: number;
     price: number;

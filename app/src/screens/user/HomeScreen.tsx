@@ -25,7 +25,7 @@ import { useLocation } from '../../context/LocationContext';
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
     const { colors, isDark } = useTheme();
-    const { location, detectLocation } = useLocation();
+    const { location, detectLocation, availableCities, setCity } = useLocation();
     const [categories, setCategories] = useState<Category[]>([]);
     const [services, setServices] = useState<any[]>([]);
     const [banners, setBanners] = useState<Banner[]>([]);
@@ -48,10 +48,8 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
             // Prepare query params
             const params = new URLSearchParams();
-            if (location.latitude && location.longitude) {
-                params.append('latitude', location.latitude.toString());
-                params.append('longitude', location.longitude.toString());
-                if (location.city) params.append('city', location.city);
+            if (location.city) {
+                params.append('city', location.city);
             }
 
             const categoriesRes = await api.get(`/categories?${params.toString()}`);
@@ -96,7 +94,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
 
     const onRefresh = () => {
         setRefreshing(true);
-        detectLocation();
+        // detectLocation(); // Don't auto-detect on simple refresh unless needed
         fetchData();
     };
 
@@ -180,7 +178,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
                     >
                         <Ionicons name="location" size={16} color={colors.primary} />
                         <Text style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
-                            {location.loading ? "Locating..." : location.city ? `${location.city}, ${location.state || ''}` : "Select Location"}
+                            {location.city ? location.city : "Select Location"}
                         </Text>
                         <Ionicons name="chevron-down" size={14} color={colors.textLight} />
                     </TouchableOpacity>
@@ -284,10 +282,10 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
                     <View style={styles.emptyState}>
                         <Ionicons name="location-outline" size={48} color={colors.textLight} />
                         <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-                            {location.city ? `No services in ${location.city}` : "No services found"}
+                            {location.city ? `No services in ${location.city}` : "Please select a city"}
                         </Text>
                         <Text style={[styles.emptySubtext, { color: colors.textLight, textAlign: 'center', marginHorizontal: 20 }]}>
-                            We are not available in your area yet.
+                            {location.city ? "We are not available in your area yet." : "Select your city to see available services."}
                         </Text>
                     </View>
                 )}
@@ -335,20 +333,34 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
                             <Text style={[styles.modalOptionText, { color: colors.text }]}>Detect Current Location</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={styles.modalOption}
-                            onPress={() => {
-                                setLocationModalVisible(false);
-                                navigation.navigate('MyAddresses');
-                            }}
-                        >
-                            <View style={[styles.modalIcon, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
-                                <Ionicons name="add-circle-outline" size={20} color="#10B981" />
-                            </View>
-                            <Text style={[styles.modalOptionText, { color: colors.text }]}>Add / Select Address</Text>
-                        </TouchableOpacity>
+                        <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 8 }} />
+                        <Text style={{ marginLeft: 8, marginBottom: 8, color: colors.textSecondary, fontSize: 13 }}>Available Cities</Text>
 
-
+                        <FlatList
+                            data={availableCities}
+                            keyExtractor={(item) => item._id}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={styles.modalOption}
+                                    onPress={() => {
+                                        setCity(item.name);
+                                        setLocationModalVisible(false);
+                                    }}
+                                >
+                                    <View style={[styles.modalIcon, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
+                                        <Ionicons name="location-outline" size={20} color="#10B981" />
+                                    </View>
+                                    <View>
+                                        <Text style={[styles.modalOptionText, { color: colors.text }]}>{item.name}</Text>
+                                        {item.state && <Text style={{ fontSize: 12, color: colors.textSecondary }}>{item.state}</Text>}
+                                    </View>
+                                    {location.city === item.name && (
+                                        <Ionicons name="checkmark-circle" size={20} color={colors.primary} style={{ marginLeft: 'auto' }} />
+                                    )}
+                                </TouchableOpacity>
+                            )}
+                            style={{ maxHeight: 300 }}
+                        />
 
                         <TouchableOpacity
                             style={styles.closeButton}
@@ -362,7 +374,6 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         </SafeAreaView>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

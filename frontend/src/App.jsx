@@ -76,10 +76,12 @@ import BannerManagement from "./components/admin-panel/BannerManagement";
 import CouponManagement from "./components/admin-panel/CouponManagement";
 import CoinsManagement from "./components/admin-panel/CoinsManagement";
 import FeeManagement from "./components/admin-panel/FeeManagement";
+import FinanceManagement from "./components/admin-panel/FinanceManagement";
 import WithdrawalManagement from "./components/admin-panel/WithdrawalManagement";
 import HelpManagement from "./components/admin-panel/HelpManagement";
 import UserPushNotifications from "./components/admin-panel/UserPushNotifications";
 import WorkerPushNotifications from "./components/admin-panel/WorkerPushNotifications";
+import EmployeeManagement from "./components/admin-panel/EmployeeManagement";
 
 import UserLayout from "./components/UserLayout";
 
@@ -133,7 +135,7 @@ export default function App() {
             {/* ADMIN ROUTES */}
             <Route path="/admin-login" element={<AdminLoginPage />} />
             <Route path="/admin-register" element={<AdminRegisterPage />} />
-            <Route element={<ProtectedRoute allowedRoles={['admin']} redirectPath="/admin-login" />}>
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'superadmin', 'employee']} redirectPath="/admin-login" />}>
               <Route path="/admin-dashboard" element={<AdminLayout />}>
                 <Route index element={<DashboardContent />} />
                 <Route path="user-app" element={<UserAppDashboard />} />
@@ -148,10 +150,12 @@ export default function App() {
                 <Route path="coupons" element={<CouponManagement />} />
                 <Route path="coins" element={<CoinsManagement />} />
                 <Route path="fees" element={<FeeManagement />} />
+                <Route path="finance" element={<FinanceManagement />} />
                 <Route path="withdrawals" element={<WithdrawalManagement />} />
                 <Route path="help" element={<HelpManagement />} />
                 <Route path="notifications/user" element={<UserPushNotifications />} />
                 <Route path="notifications/worker" element={<WorkerPushNotifications />} />
+                <Route path="employees" element={<EmployeeManagement />} />
               </Route>
               {/* Assign Worker Page - Outside Layout to take full width/focus */}
               <Route path="/admin/bookings/:id/assign" element={<AssignWorkerPage />} />
