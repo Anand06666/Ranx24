@@ -21,6 +21,7 @@ backend_error_log.txt
 # Sensitive credentials - NEVER commit these
 config/serviceAccountKey.json
 config/firebase-credentials.json
+firebase-credentials.json
 *.pem
 *.key
 *.p12

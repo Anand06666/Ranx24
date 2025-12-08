@@ -1,3 +1,4 @@
+import express from 'express';
 import { adminLogin, adminRegister, getAllUsers, deleteUser, createUser, getDashboardStats, getWithdrawalRequests, approveWithdrawal, rejectWithdrawal, createEmployee, getEmployees, deleteEmployee, changePassword } from '../controller/adminController.js';
 
 const router = express.Router();
