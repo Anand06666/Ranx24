@@ -46,9 +46,16 @@ app.use(cors({
       "http://localhost:19006",
       "https://www.ranx24.com",
       "https://ranx24.com",
-      process.env.CLIENT_URL, // Allow production frontend
-      process.env.ADMIN_URL   // Allow production admin panel if separate
-    ].filter(Boolean); // Remove undefined values
+      "https://backend.ranx24.com",
+      process.env.CLIENT_URL,
+      process.env.ADMIN_URL
+    ].filter(Boolean);
+
+    // Merge with ALLOWED_ORIGINS from env if it exists
+    if (process.env.ALLOWED_ORIGINS) {
+      const envOrigins = process.env.ALLOWED_ORIGINS.split(',');
+      allowedOrigins.push(...envOrigins);
+    }
 
     // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) return callback(null, true);
@@ -227,14 +234,15 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+    origin: [
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:5174",
-      "http://localhost:5174",
       "http://localhost:19006",
       "https://www.ranx24.com",
-      "https://ranx24.com"
+      "https://ranx24.com",
+      "https://backend.ranx24.com",
+      ...(process.env.ALLOWED_ORIGINS?.split(',') || [])
     ],
     credentials: true
   },
