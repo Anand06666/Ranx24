@@ -21,6 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.RanX24.user",
+      "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {

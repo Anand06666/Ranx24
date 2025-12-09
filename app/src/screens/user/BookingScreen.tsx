@@ -35,6 +35,7 @@ const BookingScreen = ({ navigation, route }: any) => {
     const [selectedDate, setSelectedDate] = useState(tomorrow);
     const [bookingType, setBookingType] = useState<'half-day' | 'full-day' | 'multiple-days'>('full-day');
     const [days, setDays] = useState(1);
+    const [bookingTime, setBookingTime] = useState("09:00 AM"); // New State
 
     useEffect(() => {
         fetchWorkers();
@@ -70,7 +71,14 @@ const BookingScreen = ({ navigation, route }: any) => {
     };
 
     const calculatePrice = () => {
-        if (!selectedWorker) return 0;
+        // If no worker selected, use fallback price from params or default
+        if (!selectedWorker) {
+            const fallbackPrice = route.params?.basePrice || 500;
+            if (bookingType === 'half-day') return Math.round(fallbackPrice * 0.6);
+            if (bookingType === 'full-day') return fallbackPrice;
+            return fallbackPrice * days;
+        }
+
         // Logic to find price for the specific service if available, else base price
         let basePrice = selectedWorker.basePrice || 500;
 
@@ -191,6 +199,152 @@ const BookingScreen = ({ navigation, route }: any) => {
         </TouchableOpacity>
     );
 
+    // If service-booking mode, we don't need to fetch workers or show the list
+    const isServiceMode = route.params?.mode === 'service-booking';
+
+    // ... existing worker fetching logic ...
+    useEffect(() => {
+        if (!isServiceMode) {
+            fetchWorkers();
+        }
+    }, [categoryId, serviceId, location, isServiceMode]);
+
+    // Service Mode Render
+    if (isServiceMode) {
+        return (
+            <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+                <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
+                <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Ionicons name="arrow-back" size={24} color={colors.text} />
+                    </TouchableOpacity>
+                    <View style={styles.headerCenter}>
+                        <Text style={[styles.headerTitle, { color: colors.text }]}>Book Service</Text>
+                        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>{serviceName}</Text>
+                    </View>
+                    <View style={{ width: 24 }} />
+                </View>
+
+                <ScrollView style={{ padding: 20 }}>
+                    {/* Service Info Card */}
+                    <View style={[styles.workerCard2, { backgroundColor: isDark ? '#374151' : '#F8FAFC' }]}>
+                        <View style={[styles.workerImage2, { backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' }]}>
+                            <Ionicons name="briefcase-outline" size={24} color="#FFF" />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                            <Text style={[styles.workerName2, { color: colors.text }]}>
+                                {serviceName || 'Selected Service'}
+                            </Text>
+                            <Text style={[styles.workerServices2, { color: colors.textSecondary }]}>
+                                {categoryName}
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* Compact Date Selection */}
+                    <View style={styles.section}>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Select Date & Time</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingBottom: 4 }}>
+                            {Array.from({ length: 14 }).map((_, i) => {
+                                const date = new Date();
+                                date.setDate(date.getDate() + 1 + i);
+                                const isSelected = date.toDateString() === selectedDate.toDateString();
+                                return (
+                                    <TouchableOpacity
+                                        key={i}
+                                        style={[
+                                            styles.dateCard,
+                                            { backgroundColor: isSelected ? colors.primary : (isDark ? '#374151' : '#F8FAFC'), borderColor: isSelected ? colors.primary : colors.border }
+                                        ]}
+                                        onPress={() => setSelectedDate(date)}
+                                    >
+                                        <Text style={[styles.dateDay, { color: isSelected ? '#FFF' : colors.textSecondary }]}>{date.toLocaleDateString('en-US', { weekday: 'short' })}</Text>
+                                        <Text style={[styles.dateNum, { color: isSelected ? '#FFF' : colors.text }]}>{date.getDate()}</Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </ScrollView>
+                    </View>
+
+                    {/* Time Selection */}
+                    <View style={styles.section}>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Select Time</Text>
+                        <View style={styles.timeGrid}>
+                            {["09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM", "06:00 PM", "07:00 PM"].map((time, index) => {
+                                const isSelected = bookingTime === time;
+                                return (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={[
+                                            styles.timeSlot,
+                                            { backgroundColor: isSelected ? colors.primary : (isDark ? '#374151' : '#F8FAFC'), borderColor: isSelected ? colors.primary : colors.border }
+                                        ]}
+                                        onPress={() => setBookingTime(time)}
+                                    >
+                                        <Text style={[styles.timeText, { color: isSelected ? '#FFF' : colors.text }]}>{time}</Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+                    </View>
+
+                    {/* Summary */}
+                    <View style={[styles.summary, { backgroundColor: isDark ? '#374151' : '#F8FAFC', borderColor: colors.border }]}>
+                        <View style={styles.summaryRow}>
+                            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Service</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>{serviceName}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Date</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>
+                                {selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Time</Text>
+                            <Text style={[styles.summaryValue, { color: colors.text }]}>
+                                {bookingTime}
+                            </Text>
+                        </View>
+                        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+                        <View style={styles.summaryRow}>
+                            <Text style={[styles.totalLabel, { color: colors.text }]}>Estimated Price</Text>
+                            <Text style={[styles.totalAmount, { color: colors.primary }]}>₹500</Text>
+                        </View>
+                    </View>
+                    <View style={{ height: 100 }} />
+                </ScrollView>
+
+                <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+                    <TouchableOpacity
+                        style={[styles.bookNowBtn, { backgroundColor: colors.primary, flex: 1 }]}
+                        onPress={() => {
+                            const bookingData = {
+                                workerId: undefined,
+                                workerName: 'System Assigned',
+                                serviceId: serviceId,
+                                service: serviceName || 'General Service',
+                                category: categoryName || 'General',
+                                price: 500,
+                                startDate: selectedDate.toISOString(),
+                                bookingType: 'full-day',
+                                days: 1,
+                                bookingDate: selectedDate.toISOString().split('T')[0],
+                                bookingTime: bookingTime,
+                                image: null
+                            };
+                            navigation.navigate('Checkout', { directBooking: bookingData });
+                        }}
+                    >
+                        <Text style={styles.bookNowBtnText}>Proceed to Checkout</Text>
+                        <Ionicons name="arrow-forward" size={18} color="#FFF" />
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    // Main Render (Worker Selection)
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
@@ -233,7 +387,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                 }
             />
 
-            {/* Booking Modal */}
             <Modal
                 visible={showBookingModal}
                 animationType="slide"
@@ -252,7 +405,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                         <ScrollView style={styles.modalScroll}>
                             {selectedWorker && (
                                 <>
-                                    {/* Worker Info */}
                                     <View style={[styles.workerCard2, { backgroundColor: isDark ? '#374151' : '#F8FAFC' }]}>
                                         <Image
                                             source={{
@@ -272,7 +424,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                                         </View>
                                     </View>
 
-                                    {/* Date Selection */}
                                     <View style={styles.section}>
                                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Select Date</Text>
                                         <DatePicker
@@ -281,7 +432,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                                         />
                                     </View>
 
-                                    {/* Duration Options */}
                                     <View style={styles.section}>
                                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Duration</Text>
                                         <View style={styles.durationRow}>
@@ -344,7 +494,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                                         </View>
                                     </View>
 
-                                    {/* Days Counter */}
                                     {bookingType === 'multiple-days' && (
                                         <View style={styles.section}>
                                             <Text style={[styles.sectionTitle, { color: colors.text }]}>Number of Days</Text>
@@ -370,7 +519,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                                         </View>
                                     )}
 
-                                    {/* Summary */}
                                     <View style={[styles.summary, { backgroundColor: isDark ? '#374151' : '#F8FAFC', borderColor: colors.border }]}>
                                         <View style={styles.summaryRow}>
                                             <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Professional</Text>
@@ -402,7 +550,6 @@ const BookingScreen = ({ navigation, route }: any) => {
                             )}
                         </ScrollView>
 
-                        {/* Footer Buttons */}
                         <View style={[styles.footer, { borderTopColor: colors.border }]}>
                             <TouchableOpacity
                                 style={[styles.cartBtn, { backgroundColor: colors.card, borderColor: colors.primary }]}
@@ -477,6 +624,12 @@ const styles = StyleSheet.create({
     cartBtnText: { fontSize: 16, fontWeight: '700' },
     bookNowBtn: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: 14, borderRadius: 12, gap: 8, ...SHADOWS.medium },
     bookNowBtnText: { fontSize: 16, fontWeight: '700', color: '#FFF' },
+    dateCard: { width: 60, height: 75, borderRadius: 12, justifyContent: 'center', alignItems: 'center', borderWidth: 1, marginRight: 8 },
+    dateDay: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
+    dateNum: { fontSize: 18, fontWeight: '700' },
+    timeGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+    timeSlot: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, borderWidth: 1, marginBottom: 8 },
+    timeText: { fontSize: 13, fontWeight: '600' },
 });
 
 export default BookingScreen;

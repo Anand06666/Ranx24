@@ -29,6 +29,8 @@ export type UserStackParamList = {
         singleWorkerId?: string;
         serviceId?: string;
         serviceName?: string;
+        basePrice?: number;
+        mode?: 'service-booking';
     };
     CategoryDetail: {
         categoryId: string;

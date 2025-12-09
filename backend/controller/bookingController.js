@@ -1056,7 +1056,7 @@ export const getBookingById = async (req, res) => {
     // Authorization: Only the user who created the booking, the assigned worker, or an admin can view it
     const isUser = booking.user && booking.user._id.toString() === req.user._id.toString();
     const isWorker = booking.worker && booking.worker._id && booking.worker._id.toString() === req.user._id.toString();
-    const isAdmin = req.user.role === 'admin';
+    const isAdmin = ['admin', 'superadmin', 'employee'].includes(req.user.role);
 
     if (!isUser && !isWorker && !isAdmin) {
       console.log(`⛔ [DEBUG] Authorization Failed!`);

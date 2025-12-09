@@ -220,7 +220,7 @@ const WalletScreen = ({ navigation }) => {
                 </View>
             </View>
             <View>
-                {item.amount && (
+                {!!item.amount && (
                     <Text
                         style={[
                             styles.transactionAmount,
@@ -231,7 +231,7 @@ const WalletScreen = ({ navigation }) => {
                         {item.amount}
                     </Text>
                 )}
-                {item.coinAmount && (
+                {!!item.coinAmount && (
                     <Text style={styles.coinAmount}>
                         {item.coinAmount > 0 ? '+' : ''}
                         {item.coinAmount} YC

@@ -111,16 +111,27 @@ const removeItemFromCart = async (req, res) => {
       return res.status(404).json({ message: 'Cart not found' });
     }
 
+    // console.log("Removing item ID:", req.params.workerId);
+    // console.log("Current Cart Items:", JSON.stringify(cart.items.map(i => ({id: i._id, worker: i.worker}))));
+
+    const originalLength = cart.items.length;
     cart.items = cart.items.filter(
-      item => item.worker.toString() !== req.params.workerId
+      item => item._id && item._id.toString() !== req.params.workerId
     );
+
+    // Fallback: If not removed by Item ID, try removing by Worker ID (legacy support for old carts)
+    if (cart.items.length === originalLength) {
+      cart.items = cart.items.filter(
+        item => !item.worker || item.worker.toString() !== req.params.workerId
+      );
+    }
 
     await cart.save();
     const populatedCart = await Cart.findById(cart._id).populate('items.worker');
     res.status(200).json(populatedCart);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    console.error("Error removing from cart:", error);
+    res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
 

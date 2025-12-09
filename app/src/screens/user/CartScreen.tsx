@@ -60,7 +60,7 @@ const CartScreen = ({ navigation }) => {
                             {item.worker?.firstName} {item.worker?.lastName}
                         </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleRemove(item.worker?._id || item.worker)}>
+                    <TouchableOpacity onPress={() => handleRemove(item._id)}>
                         <Ionicons name="trash-outline" size={20} color={colors.error} />
                     </TouchableOpacity>
                 </View>
@@ -128,7 +128,7 @@ const CartScreen = ({ navigation }) => {
             <FlatList
                 data={cartItems}
                 renderItem={renderCartItem}
-                keyExtractor={(item) => item._id || Math.random().toString()}
+                keyExtractor={(item) => item._id}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
             />

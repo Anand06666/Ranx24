@@ -68,7 +68,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
                 const servicesRes = await api.get(`/services?limit=5`);
                 setServices(servicesRes.data || []);
             } catch (serviceErr) {
-                console.log('Services fetch error:', serviceErr);
+                // console.log('Services fetch error:', serviceErr);
             }
         } catch (err) {
             console.error('Data fetch error:', err);
@@ -118,18 +118,13 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         <TouchableOpacity
             style={[styles.workerCard, { backgroundColor: colors.card }]}
             onPress={() => {
-                navigation.navigate('Checkout', {
-                    directBooking: {
-                        serviceId: item._id,
-                        service: item.name,
-                        category: item.category?.name || 'Service',
-                        price: item.basePrice,
-                        bookingDate: new Date(Date.now() + 86400000).toISOString(), // Default to tomorrow
-                        bookingTime: "09:00 AM", // Default time
-                        days: 1,
-                        bookingType: 'full-day',
-                        image: item.image
-                    }
+                navigation.navigate('Booking', {
+                    serviceId: item._id,
+                    serviceName: item.name,
+                    categoryName: item.category?.name || 'Service',
+                    singleWorkerId: item._id, // Keep for fallback or reference
+                    basePrice: item.basePrice || 500, // <--- Added basePrice
+                    mode: 'service-booking' // <--- New flag
                 });
             }}
             activeOpacity={0.8}

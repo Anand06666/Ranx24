@@ -573,7 +573,10 @@ const CheckoutScreen = ({ navigation, route }: any) => {
                         </View>
                         <Switch
                             value={useWallet}
-                            onValueChange={setUseWallet}
+                            onValueChange={(val) => {
+                                setUseWallet(val);
+                                if (val) setPaymentMethod('online');
+                            }}
                             trackColor={{ false: isDark ? '#4B5563' : '#E5E7EB', true: '#93C5FD' }}
                             thumbColor={useWallet ? colors.primary : '#F4F3F4'}
                             disabled={walletBalance === 0}
@@ -591,14 +594,35 @@ const CheckoutScreen = ({ navigation, route }: any) => {
                     <View style={[styles.section, { backgroundColor: colors.card }]}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Payment Method</Text>
                         <TouchableOpacity
-                            style={[styles.paymentOption, { borderColor: colors.border }, paymentMethod === 'cod' && { borderColor: colors.primary, backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : '#EFF6FF' }]}
-                            onPress={() => setPaymentMethod('cod')}
+                            style={[
+                                styles.paymentOption,
+                                { borderColor: colors.border },
+                                paymentMethod === 'cod' && { borderColor: colors.primary, backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : '#EFF6FF' },
+                                (useWallet && walletAmountToUse > 0) && { opacity: 0.5, backgroundColor: isDark ? '#374151' : '#F3F4F6' }
+                            ]}
+                            onPress={() => {
+                                if (useWallet && walletAmountToUse > 0) {
+                                    Toast.show({
+                                        type: 'info',
+                                        text1: 'Wallet Applied',
+                                        text2: 'Cash on Delivery is not available when using wallet.'
+                                    });
+                                    return;
+                                }
+                                setPaymentMethod('cod');
+                            }}
+                            disabled={useWallet && walletAmountToUse > 0}
                         >
                             <View style={styles.paymentLeft}>
-                                <Ionicons name="cash-outline" size={22} color={paymentMethod === 'cod' ? colors.primary : colors.textSecondary} />
-                                <Text style={[styles.paymentText, { color: colors.textSecondary }, paymentMethod === 'cod' && { color: colors.primary, fontWeight: '600' }]}>Cash on Delivery</Text>
+                                <Ionicons name="cash-outline" size={22} color={(useWallet && walletAmountToUse > 0) ? colors.textLight : (paymentMethod === 'cod' ? colors.primary : colors.textSecondary)} />
+                                <Text style={[
+                                    styles.paymentText,
+                                    { color: colors.textSecondary },
+                                    paymentMethod === 'cod' && { color: colors.primary, fontWeight: '600' },
+                                    (useWallet && walletAmountToUse > 0) && { color: colors.textLight }
+                                ]}>Cash on Delivery</Text>
                             </View>
-                            <View style={[styles.radio, { borderColor: colors.border }]}>
+                            <View style={[styles.radio, { borderColor: (useWallet && walletAmountToUse > 0) ? colors.textLight : colors.border }]}>
                                 {paymentMethod === 'cod' && <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />}
                             </View>
                         </TouchableOpacity>
