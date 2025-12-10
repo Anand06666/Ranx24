@@ -215,6 +215,9 @@ const WalletScreen = () => {
                             onChangeText={setPayoutAmount}
                             autoFocus
                         />
+                        <Text style={styles.deductionNotice}>
+                            Note: 25% deduct hoke apne account me aayega
+                        </Text>
 
                         <View style={styles.modalButtons}>
                             <TouchableOpacity
@@ -481,6 +484,13 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: theme.colors.text.secondary,
     },
+    deductionNotice: {
+        fontSize: 12,
+        color: theme.colors.error, // or theme.colors.text.tertiary
+        marginBottom: theme.spacing.m,
+        textAlign: 'center',
+        marginTop: -8
+    }
 });
 
 export default WalletScreen;
