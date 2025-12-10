@@ -85,16 +85,19 @@ export const createBooking = async (req, res) => {
 
     // ========== FEE CALCULATION ==========
     const feeConfig = await FeeConfig.getSingleton();
+    let percentageFee = 0;
+
     if (feeConfig.isActive) {
       platformFee = feeConfig.platformFee;
 
-      // Distance calculation is deferred until worker assignment or we use a central location?
-      // For now, we might set travel charge to 0 or a fixed amount, or calculate later.
-      // Let's keep it 0 for now as we don't know the worker location.
+      // Calculate Percentage Fee
+      if (feeConfig.percentageCharge > 0) {
+        percentageFee = Math.round((price * feeConfig.percentageCharge) / 100);
+      }
     }
 
     // Add fees to total price
-    totalPrice += platformFee + travelCharge;
+    totalPrice += platformFee + percentageFee;
 
     let couponDiscount = 0;
     let coinDiscount = 0;
@@ -267,7 +270,7 @@ export const createBooking = async (req, res) => {
       status: 'pending',
       // New Fee Fields
       platformFee: { type: Number, default: 0 },
-      travelCharge: { type: Number, default: 0 },
+      percentageFee: { type: Number, default: 0 },
       distance: { type: Number, default: 0 }
     });
 
@@ -375,40 +378,20 @@ export const createBulkBookings = async (req, res) => {
 
     // ========== FEE CALCULATION ==========
     const feeConfig = await FeeConfig.getSingleton();
+    let percentageFee = 0;
+
     if (feeConfig.isActive) {
       platformFee = feeConfig.platformFee;
 
-      // Calculate Distance (using first item's worker or average? Usually bulk booking is for same location)
-      // If workers are different, distance might vary.
-      // But usually bulk booking is single order.
-      // Let's assume distance is calculated based on the first worker for now or if all workers are at same location.
-      // Or we calculate per item?
-      // The prompt says "travel charge distance wise".
-      // Let's calculate for each item if needed, but here we are calculating TOTAL order price.
-      // If we add travel charge to TOTAL, we need to know how many workers/locations.
-      // Simplification: Calculate distance for the first worker and apply travel charge once or per worker?
-      // Usually travel charge is per trip. If multiple workers come, multiple travel charges?
-      // Let's assume 1 travel charge per order for now (or per worker if they are different).
-      // Given the complexity, let's calculate distance for the first worker and apply one travel charge for the whole order.
-
-      if (bookings.length > 0) {
-        const firstWorkerId = bookings[0].workerId;
-        const firstWorker = await Worker.findById(firstWorkerId); // Need to import Worker
-
-        if (firstWorker && firstWorker.location && firstWorker.location.coordinates && address.latitude && address.longitude) {
-          distance = getDistance(
-            address.latitude,
-            address.longitude,
-            firstWorker.location.coordinates[1],
-            firstWorker.location.coordinates[0]
-          );
-          travelCharge = Math.round(distance * feeConfig.travelChargePerKm);
-        }
+      // Calculate Percentage Fee
+      if (feeConfig.percentageCharge > 0) {
+        // Calculate percentage on the sum of item prices
+        percentageFee = Math.round((totalOrderPrice * feeConfig.percentageCharge) / 100);
       }
     }
 
     // Add fees to total price
-    totalOrderPrice += platformFee + travelCharge;
+    totalOrderPrice += platformFee + percentageFee;
 
     let totalCouponDiscount = 0;
     let totalCoinDiscount = 0;
@@ -622,7 +605,7 @@ export const createBulkBookings = async (req, res) => {
         // Let's add the fee to the first booking only, or split it.
         // Splitting is better for analytics.
         platformFee: isLast ? (platformFee - (Math.floor(platformFee / bookings.length) * (bookings.length - 1))) : Math.floor(platformFee / bookings.length),
-        travelCharge: isLast ? (travelCharge - (Math.floor(travelCharge / bookings.length) * (bookings.length - 1))) : Math.floor(travelCharge / bookings.length),
+        percentageFee: isLast ? (percentageFee - (Math.floor(percentageFee / bookings.length) * (bookings.length - 1))) : Math.floor(percentageFee / bookings.length),
         distance: distance
       });
 
