@@ -241,7 +241,7 @@ export const adminLogin = async (req, res) => {
 export const getWithdrawalRequests = async (req, res) => {
   try {
     const requests = await WithdrawalRequest.find({})
-      .populate('worker', 'firstName lastName mobileNumber bankDetails')
+      .populate('worker', 'firstName lastName mobileNumber bankDetails upiId')
       .sort({ createdAt: -1 });
     res.json(requests);
   } catch (error) {

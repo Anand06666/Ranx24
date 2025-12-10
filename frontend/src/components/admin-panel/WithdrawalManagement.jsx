@@ -78,8 +78,8 @@ export default function WithdrawalManagement() {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all cursor-pointer ${filter === f
-                                        ? 'bg-white text-blue-600 shadow-sm'
-                                        : 'text-slate-500 hover:text-slate-700'
+                                    ? 'bg-white text-blue-600 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -157,8 +157,23 @@ export default function WithdrawalManagement() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-slate-500">
-                                        {/* Placeholder for bank details if available in worker model */}
-                                        <span className="text-xs italic text-slate-400">View in Profile</span>
+                                        <div className="flex flex-col gap-1 text-xs">
+                                            {request.worker?.bankDetails?.accountNumber ? (
+                                                <>
+                                                    <div className="font-semibold text-slate-700">{request.worker.bankDetails.bankName}</div>
+                                                    <div>A/C: <span className="font-mono text-slate-800">{request.worker.bankDetails.accountNumber}</span></div>
+                                                    <div>IFSC: <span className="font-mono text-slate-800">{request.worker.bankDetails.ifscCode}</span></div>
+                                                    <div>Holder: {request.worker.bankDetails.accountHolderName}</div>
+                                                </>
+                                            ) : (
+                                                <div className="text-slate-400 italic">No Bank Info</div>
+                                            )}
+                                            {request.worker?.upiId && (
+                                                <div className="mt-1 pt-1 border-t border-slate-100">
+                                                    UPI: <span className="font-semibold text-blue-600 shadow-sm px-1 bg-blue-50 rounded">{request.worker.upiId}</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         {request.status === 'pending' && (

@@ -352,6 +352,42 @@ const WorkerEditModal = ({ worker, onClose, onRefresh }) => {
                     </div>
                 </div>
 
+
+                {/* Payment Details (Read-Only) */}
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">Payment Details (Read-Only)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                        <div className="bg-white px-3 py-2 rounded border text-gray-800">
+                            {worker.bankDetails?.bankName || '-'}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <div className="bg-white px-3 py-2 rounded border text-gray-800 font-mono">
+                            {worker.bankDetails?.accountNumber || '-'}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
+                        <div className="bg-white px-3 py-2 rounded border text-gray-800 font-mono">
+                            {worker.bankDetails?.ifscCode || '-'}
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder</label>
+                        <div className="bg-white px-3 py-2 rounded border text-gray-800">
+                            {worker.bankDetails?.accountHolderName || '-'}
+                        </div>
+                    </div>
+                    <div className="col-span-1 md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+                        <div className="bg-white px-3 py-2 rounded border text-blue-600 font-semibold font-mono">
+                            {worker.upiId || '-'}
+                        </div>
+                    </div>
+                </div>
+
                 {/* Services */}
                 <h3 className="text-xl font-semibold text-blue-800 mb-2">Services & Pricing</h3>
                 {formData.services.map((svc, idx) => (
