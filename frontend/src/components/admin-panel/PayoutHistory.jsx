@@ -14,7 +14,7 @@ const PayoutHistory = () => {
 
     const fetchHistory = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/admin/payout-history', {
+            const { data } = await axios.get('https:backend.ranx24.com/api/admin/payout-history', {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('adminToken')}`
                 }
