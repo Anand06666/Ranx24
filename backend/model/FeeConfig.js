@@ -6,7 +6,7 @@ const feeConfigSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    travelChargePerKm: {
+    percentageCharge: {
         type: Number,
         default: 0,
         min: 0
@@ -23,7 +23,7 @@ const feeConfigSchema = new mongoose.Schema({
 feeConfigSchema.statics.getSingleton = async function () {
     const config = await this.findOne();
     if (config) return config;
-    return await this.create({ platformFee: 0, travelChargePerKm: 0 });
+    return await this.create({ platformFee: 0, percentageCharge: 0 });
 };
 
 const FeeConfig = mongoose.model('FeeConfig', feeConfigSchema);

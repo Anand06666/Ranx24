@@ -10,7 +10,7 @@ export default function FeeManagement() {
 
     const [config, setConfig] = useState({
         platformFee: 0,
-        travelChargePerKm: 0,
+        percentageCharge: 0,
         isActive: true
     });
 
@@ -120,21 +120,22 @@ export default function FeeManagement() {
 
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Travel Charge (per km)
+                                Percentage Charge (%)
                             </label>
                             <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">₹</span>
+                                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">%</span>
                                 <input
                                     type="number"
-                                    name="travelChargePerKm"
-                                    value={config.travelChargePerKm}
+                                    name="percentageCharge"
+                                    value={config.percentageCharge}
                                     onChange={handleChange}
                                     min="0"
+                                    max="100"
                                     className="w-full pl-8 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                     placeholder="0"
                                 />
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">Multiplied by distance (km)</p>
+                            <p className="text-xs text-slate-500 mt-1">Percentage markup on service price</p>
                         </div>
                     </div>
                 </div>

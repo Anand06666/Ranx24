@@ -18,12 +18,12 @@ export const getFees = async (req, res) => {
 // @access  Private (Admin)
 export const updateFees = async (req, res) => {
     try {
-        const { platformFee, travelChargePerKm, isActive } = req.body;
+        const { platformFee, percentageCharge, isActive } = req.body;
 
         const config = await FeeConfig.getSingleton();
 
         if (platformFee !== undefined) config.platformFee = platformFee;
-        if (travelChargePerKm !== undefined) config.travelChargePerKm = travelChargePerKm;
+        if (percentageCharge !== undefined) config.percentageCharge = percentageCharge;
         if (isActive !== undefined) config.isActive = isActive;
 
         await config.save();

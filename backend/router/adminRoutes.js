@@ -42,4 +42,8 @@ router.get('/withdrawals', protect, admin, getWithdrawalRequests);
 router.put('/withdrawals/:id/approve', protect, admin, approveWithdrawal);
 router.put('/withdrawals/:id/reject', protect, admin, rejectWithdrawal);
 
+// Payout History Route (Super Admin Only)
+import { getPayoutHistory } from '../controller/adminController.js';
+router.get('/payout-history', protect, admin, getPayoutHistory);
+
 export default router;

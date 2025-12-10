@@ -787,10 +787,14 @@ export const createWorkerTicket = async (req, res) => {
 
     const ticket = await SupportTicket.create({
       user: req.user._id,
-      userModel: 'Worker',
+      userType: 'worker',
       subject,
-      message,
-      category: category || 'general',
+      messages: [{
+        sender: 'user',
+        senderId: req.user._id,
+        senderModel: 'Worker',
+        message: message
+      }],
       status: 'open'
     });
 

@@ -250,6 +250,31 @@ export const getWithdrawalRequests = async (req, res) => {
   }
 };
 
+// @desc    Get payout history (Approved withdrawals)
+// @route   GET /api/admin/payout-history
+// @access  Private (Admin)
+export const getPayoutHistory = async (req, res) => {
+  try {
+    const history = await WithdrawalRequest.find({ status: 'approved' })
+      .populate('worker', 'firstName lastName mobileNumber bankDetails upiId')
+      .sort({ processedAt: -1 });
+
+    const totalPaidAgg = await WithdrawalRequest.aggregate([
+      { $match: { status: 'approved' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const totalPaid = totalPaidAgg.length > 0 ? totalPaidAgg[0].total : 0;
+
+    res.json({
+      totalPaid,
+      history
+    });
+  } catch (error) {
+    console.error('Error fetching payout history:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // @desc    Approve withdrawal request
 // @route   PUT /api/admin/withdrawals/:id/approve
 // @access  Private (Admin)

@@ -82,6 +82,7 @@ import HelpManagement from "./components/admin-panel/HelpManagement";
 import UserPushNotifications from "./components/admin-panel/UserPushNotifications";
 import WorkerPushNotifications from "./components/admin-panel/WorkerPushNotifications";
 import EmployeeManagement from "./components/admin-panel/EmployeeManagement";
+import PayoutHistory from "./components/admin-panel/PayoutHistory";
 const AdminChangePassword = lazy(() => import("./pages/AdminChangePassword"));
 
 import UserLayout from "./components/UserLayout";
@@ -153,6 +154,7 @@ export default function App() {
                 <Route path="fees" element={<FeeManagement />} />
                 <Route path="finance" element={<FinanceManagement />} />
                 <Route path="withdrawals" element={<WithdrawalManagement />} />
+                <Route path="payout-history" element={<PayoutHistory />} />
                 <Route path="help" element={<HelpManagement />} />
                 <Route path="notifications/user" element={<UserPushNotifications />} />
                 <Route path="notifications/worker" element={<WorkerPushNotifications />} />

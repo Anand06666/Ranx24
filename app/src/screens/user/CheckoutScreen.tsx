@@ -59,7 +59,7 @@ const CheckoutScreen = ({ navigation, route }: any) => {
     // Fee State
     const [feeConfig, setFeeConfig] = useState<any>(null);
     const [platformFee, setPlatformFee] = useState(0);
-    const [travelCharge, setTravelCharge] = useState(0);
+    const [percentageFee, setPercentageFee] = useState(0);
     const [distance, setDistance] = useState(0);
 
     const [useWallet, setUseWallet] = useState(false);
@@ -83,9 +83,9 @@ const CheckoutScreen = ({ navigation, route }: any) => {
         } catch (error) {
             console.error('Error fetching fee config:', error);
             // Set fallback config - no fees if can't load
-            setFeeConfig({ platformFee: 0, travelChargePerKm: 0, isActive: false });
+            setFeeConfig({ platformFee: 0, percentageCharge: 0, isActive: false });
             setPlatformFee(0);
-            setTravelCharge(0);
+            setPercentageFee(0);
         }
     };
 
@@ -125,46 +125,20 @@ const CheckoutScreen = ({ navigation, route }: any) => {
 
 
 
-    // Calculate distance and travel charge when address or fee config changes
+    // Calculate percentage fee when fee config or items change
     useEffect(() => {
-        calculateTravelCharge();
-    }, [street, city, state, zipCode, feeConfig, bookingItems]);
+        calculatePercentageFee();
+    }, [feeConfig, bookingItems]);
 
-    const calculateTravelCharge = async () => {
-        if (!feeConfig?.isActive || !feeConfig?.travelChargePerKm) {
-            setTravelCharge(0);
+    const calculatePercentageFee = () => {
+        if (!feeConfig?.isActive || !feeConfig?.percentageCharge) {
+            setPercentageFee(0);
             return;
         }
 
-        // Optimization: Only geocode if address looks complete enough.
-        if (street && city) {
-            try {
-                const fullAddress = `${street}, ${city}, ${state}, ${zipCode}`;
-                const geocoded = await Location.geocodeAsync(fullAddress);
-
-                if (geocoded.length > 0 && bookingItems.length > 0) {
-                    const userLat = geocoded[0].latitude;
-                    const userLng = geocoded[0].longitude;
-
-                    // Check if worker is assigned
-                    const worker = bookingItems[0].worker;
-                    if (worker?.location?.coordinates) {
-                        const workerLng = worker.location.coordinates[0];
-                        const workerLat = worker.location.coordinates[1];
-
-                        const dist = getDistanceFromLatLonInKm(userLat, userLng, workerLat, workerLng);
-                        setDistance(Math.round(dist * 10) / 10); // Round to 1 decimal
-                        setTravelCharge(Math.round(dist * feeConfig.travelChargePerKm));
-                    } else {
-                        // No worker assigned yet, travel charge calculated later
-                        setDistance(0);
-                        setTravelCharge(0);
-                    }
-                }
-            } catch (error) {
-                console.log('Error calculating distance:', error);
-            }
-        }
+        const itemsTotal = bookingItems.reduce((sum: number, item: any) => sum + (item.price * (item.days || 1)), 0);
+        const fee = Math.round((itemsTotal * feeConfig.percentageCharge) / 100);
+        setPercentageFee(fee);
     };
 
     const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -277,7 +251,7 @@ const CheckoutScreen = ({ navigation, route }: any) => {
     const coinDiscount = coinsToUse * coinRate;
 
     // Wallet Calculation
-    const payableAfterCoins = Math.max(0, priceAfterCoupon - coinDiscount + platformFee + travelCharge); // Add fees here
+    const payableAfterCoins = Math.max(0, priceAfterCoupon - coinDiscount + platformFee + percentageFee); // Add fees here
     const walletAmountToUse = useWallet ? Math.min(walletBalance, payableAfterCoins) : 0;
 
     const finalPayable = Math.max(0, payableAfterCoins - walletAmountToUse);
@@ -327,7 +301,9 @@ const CheckoutScreen = ({ navigation, route }: any) => {
             coinsUsed: coinsToUse,
             walletAmountUsed: walletAmountToUse,
             couponCode: couponId ? couponCode : undefined,
-            paymentId: undefined
+            paymentId: undefined,
+            platformFee,
+            percentageFee
         };
 
         try {
@@ -655,10 +631,10 @@ const CheckoutScreen = ({ navigation, route }: any) => {
                             <Text style={[styles.billValue, { color: colors.text }]}>₹{platformFee}</Text>
                         </View>
                     )}
-                    {travelCharge > 0 && (
+                    {percentageFee > 0 && (
                         <View style={styles.billRow}>
-                            <Text style={[styles.billLabel, { color: colors.textSecondary }]}>Travel Charge ({distance} km)</Text>
-                            <Text style={[styles.billValue, { color: colors.text }]}>₹{travelCharge}</Text>
+                            <Text style={[styles.billLabel, { color: colors.textSecondary }]}>Service Charge ({feeConfig?.percentageCharge}%)</Text>
+                            <Text style={[styles.billValue, { color: colors.text }]}>₹{percentageFee}</Text>
                         </View>
                     )}
                     {couponDiscount > 0 && (

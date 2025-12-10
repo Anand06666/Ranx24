@@ -19,7 +19,8 @@ import {
   Bell,
   Megaphone,
   Briefcase,
-  Key
+  Key,
+  History
 } from 'lucide-react';
 import logo from '../../assets/images/logo.png';
 
@@ -103,6 +104,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
           {userRole !== 'employee' && (
             <NavItem to="/admin-dashboard/withdrawals" label="Withdrawals" icon={Wallet} />
+          )}
+
+          {userRole !== 'employee' && (
+            <NavItem to="/admin-dashboard/payout-history" label="Payout History" icon={History} />
           )}
 
           {userRole !== 'employee' && (
