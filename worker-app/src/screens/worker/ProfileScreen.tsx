@@ -9,17 +9,71 @@ import {
     Alert,
     StatusBar,
     Platform,
+    TextInput,
+    ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
-import { API_URL } from '../../services/api';
+import axios from 'axios';
+import api, { API_URL } from '../../services/api';
 import { theme } from '../../theme/theme';
 import { ImageSkeleton } from '../../components/SkeletonLoader';
 
 const ProfileScreen = ({ navigation }: any) => {
-    const { worker, logout } = useAuth();
+    const { worker, logout, refreshWorker } = useAuth(); // Assuming refreshWorker exists
     const [imageLoading, setImageLoading] = useState(true);
+
+    // Payout State
+    const [isEditingPayout, setIsEditingPayout] = useState(false);
+    const [savingPayout, setSavingPayout] = useState(false);
+    const [payoutForm, setPayoutForm] = useState({
+        bankDetails: {
+            bankName: worker?.bankDetails?.bankName || '',
+            accountNumber: worker?.bankDetails?.accountNumber || '',
+            ifscCode: worker?.bankDetails?.ifscCode || '',
+            accountHolderName: worker?.bankDetails?.accountHolderName || ''
+        },
+        upiId: worker?.upiId || ''
+    });
+
+    const updatePayoutForm = (field: string, value: string) => {
+        setPayoutForm(prev => ({
+            ...prev,
+            bankDetails: { ...prev.bankDetails, [field]: value }
+        }));
+    };
+
+    const handleSavePayout = async () => {
+        try {
+            if (!worker) return;
+            setSavingPayout(true);
+            const token = ''; // Get token from storage or context if needed, but context usually handles auth header in axios interceptor if configured.
+            // But here raw axios is used? No, api service.
+            // Let's use `api` service instead of axios directly if possible, but file imports `API_URL` only.
+            // I'll import `api` default as well.
+
+            // Actually existing imports: `import { API_URL } from '../../services/api';`
+            // I should import `api` from `../../services/api`
+
+            // For now, let's assume `api` handles token.
+            // I'll add `import api from '../../services/api';` to top via this replacement too.
+
+            await api.put(`/workers/${worker._id}`, {
+                bankDetails: payoutForm.bankDetails,
+                upiId: payoutForm.upiId
+            });
+
+            Alert.alert('Success', 'Payout details updated successfully');
+            setIsEditingPayout(false);
+            if (refreshWorker) refreshWorker(); // Refresh context
+        } catch (error) {
+            console.error('Error updating payout details:', error);
+            Alert.alert('Error', 'Failed to update details');
+        } finally {
+            setSavingPayout(false);
+        }
+    };
 
     const handleLogout = () => {
         Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -159,6 +213,107 @@ const ProfileScreen = ({ navigation }: any) => {
                             </View>
                         ) : (
                             <Text style={styles.emptyText}>No services added</Text>
+                        )}
+                    </View>
+                </View>
+
+                {/* Payout Details Section */}
+                <View style={styles.section}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing.m }}>
+                        <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>Payout Details</Text>
+                        <TouchableOpacity onPress={() => setIsEditingPayout(!isEditingPayout)}>
+                            <Text style={{ color: theme.colors.primary, fontWeight: '600' }}>
+                                {isEditingPayout ? 'Cancel' : 'Edit'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.card}>
+                        {isEditingPayout ? (
+                            <View style={{ gap: 12 }}>
+                                <View>
+                                    <Text style={styles.label}>Bank Name</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={payoutForm.bankDetails?.bankName}
+                                        onChangeText={t => updatePayoutForm('bankName', t)}
+                                        placeholder="e.g. HDFC Bank"
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>Account Number</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={payoutForm.bankDetails?.accountNumber}
+                                        onChangeText={t => updatePayoutForm('accountNumber', t)}
+                                        keyboardType="numeric"
+                                        placeholder="Enter Account Number"
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>IFSC Code</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={payoutForm.bankDetails?.ifscCode}
+                                        onChangeText={t => updatePayoutForm('ifscCode', t)}
+                                        autoCapitalize="characters"
+                                        placeholder="e.g. HDFC0001234"
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>Account Holder Name</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={payoutForm.bankDetails?.accountHolderName}
+                                        onChangeText={t => updatePayoutForm('accountHolderName', t)}
+                                        placeholder="Name as per bank records"
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={styles.label}>UPI ID</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        value={payoutForm.upiId}
+                                        onChangeText={t => setPayoutForm({ ...payoutForm, upiId: t })}
+                                        placeholder="e.g. user@upi"
+                                    />
+                                </View>
+                                <TouchableOpacity
+                                    style={[styles.editButton, { marginTop: 8 }]}
+                                    onPress={handleSavePayout}
+                                    disabled={savingPayout}
+                                >
+                                    {savingPayout ? <ActivityIndicator color="white" /> : <Text style={styles.editButtonText}>Save Details</Text>}
+                                </TouchableOpacity>
+                            </View>
+                        ) : (
+                            <>
+                                <InfoRow
+                                    icon="business-outline"
+                                    label="Bank Name"
+                                    value={worker?.bankDetails?.bankName || 'Not Added'}
+                                />
+                                <InfoRow
+                                    icon="card-outline"
+                                    label="Account Number"
+                                    value={worker?.bankDetails?.accountNumber || 'Not Added'}
+                                />
+                                <InfoRow
+                                    icon="code-slash-outline"
+                                    label="IFSC Code"
+                                    value={worker?.bankDetails?.ifscCode || 'Not Added'}
+                                />
+                                <InfoRow
+                                    icon="person-outline"
+                                    label="Account Holder"
+                                    value={worker?.bankDetails?.accountHolderName || 'Not Added'}
+                                />
+                                <InfoRow
+                                    icon="phone-portrait-outline"
+                                    label="UPI ID"
+                                    value={worker?.upiId || 'Not Added'}
+                                />
+                            </>
                         )}
                     </View>
                 </View>
@@ -466,6 +621,22 @@ const styles = StyleSheet.create({
     versionSubtext: {
         fontSize: 12,
         color: theme.colors.text.tertiary,
+    },
+    input: {
+        backgroundColor: theme.colors.background,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        borderRadius: theme.borderRadius.m,
+        padding: theme.spacing.m,
+        fontSize: 14,
+        color: theme.colors.text.primary,
+        marginBottom: theme.spacing.m,
+    },
+    label: {
+        fontSize: 12,
+        color: theme.colors.text.secondary,
+        marginBottom: 4,
+        fontWeight: '500',
     },
 });
 

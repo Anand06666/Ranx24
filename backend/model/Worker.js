@@ -155,6 +155,17 @@ const workerSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  // Payout Details
+  bankDetails: {
+    accountHolderName: { type: String, default: '' },
+    accountNumber: { type: String, default: '' },
+    ifscCode: { type: String, default: '' },
+    bankName: { type: String, default: '' }
+  },
+  upiId: {
+    type: String,
+    default: ''
+  },
 }, {
   timestamps: true,
   toJSON: { virtuals: true }, // Ensure virtuals are included when converting to JSON

@@ -24,6 +24,13 @@ export interface Worker {
     averageRating: number;
     totalReviews: number;
     profilePic?: string;
+    bankDetails?: {
+        bankName: string;
+        accountNumber: string;
+        ifscCode: string;
+        accountHolderName: string;
+    };
+    upiId?: string;
 }
 
 export interface ServicePricing {
@@ -70,9 +77,10 @@ export interface AuthContextType {
     worker: Worker | null;
     isAuthenticated: boolean;
     loading: boolean;
-    login: (mobileNumber: string, otp: string) => Promise<void>;
+    login: (workerData: Worker, token: string) => Promise<void>;
     logout: () => Promise<void>;
     updateWorker: (worker: Worker) => void;
+    refreshWorker: () => Promise<void>;
 }
 
 export type RootStackParamList = {

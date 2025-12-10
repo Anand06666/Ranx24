@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Worker, AuthContextType } from '../types';
 import socketService from '../services/socketService';
+import api from '../services/api';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -59,6 +60,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         AsyncStorage.setItem('worker', JSON.stringify(updatedWorker));
     };
 
+    const refreshWorker = async () => {
+        try {
+            if (!worker?._id) return;
+            const response = await api.get(`/workers/${worker._id}`);
+            const updatedWorker = response.data;
+            setWorker(updatedWorker);
+            AsyncStorage.setItem('worker', JSON.stringify(updatedWorker));
+        } catch (error) {
+            console.error('Error refreshing worker:', error);
+        }
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -68,6 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 login,
                 logout,
                 updateWorker,
+                refreshWorker,
             }}
         >
             {children}

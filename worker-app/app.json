@@ -4,10 +4,10 @@
     "slug": "ranx24-service-partner",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo.jpg",
       "resizeMode": "contain",
       "backgroundColor": "#1E40AF"
     },
@@ -20,10 +20,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo.jpg",
         "backgroundColor": "#1E40AF"
       },
       "package": "com.RanX24.Worker",
+      "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "CAMERA",
@@ -34,7 +35,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/icon.png"
+      "favicon": "./assets/logo.jpg"
     },
     "plugins": [
       "expo-image-picker",

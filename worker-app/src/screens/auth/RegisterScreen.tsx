@@ -21,12 +21,26 @@ import { theme } from '../../theme/theme';
 // Destructure for easier access
 const { colors, spacing, shadows } = theme;
 
+interface RegisterFormData {
+    firstName: string;
+    lastName: string;
+    mobileNumber: string;
+    password: string;
+    confirmPassword: string;
+    state: string;
+    district: string;
+    city: string;
+    aadhaarNumber: string;
+    panNumber: string;
+    categories: string[];
+}
+
 const RegisterScreen = ({ navigation }: any) => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<RegisterFormData>({
         firstName: '',
         lastName: '',
         mobileNumber: '',
@@ -37,6 +51,7 @@ const RegisterScreen = ({ navigation }: any) => {
         city: '',
         aadhaarNumber: '',
         panNumber: '',
+        categories: [],
     });
 
     const [images, setImages] = useState<{
@@ -45,7 +60,7 @@ const RegisterScreen = ({ navigation }: any) => {
         panCard?: string;
     }>({});
 
-    const updateField = (field: string, value: string) => {
+    const updateField = (field: string, value: any) => {
         setFormData({ ...formData, [field]: value });
     };
 
@@ -116,9 +131,18 @@ const RegisterScreen = ({ navigation }: any) => {
             const uploadData = new FormData();
 
             // Append text fields
+            // Append fields
             Object.keys(formData).forEach(key => {
-                if (key !== 'confirmPassword') {
-                    uploadData.append(key, (formData as any)[key]);
+                const value = (formData as any)[key];
+                if (key === 'confirmPassword') return;
+
+                if (Array.isArray(value)) {
+                    // Append each item for array fields
+                    value.forEach((item) => {
+                        uploadData.append(key, item);
+                    });
+                } else {
+                    uploadData.append(key, value);
                 }
             });
 
@@ -272,9 +296,64 @@ const RegisterScreen = ({ navigation }: any) => {
         </View>
     );
 
+    const [categories, setCategories] = useState<any[]>([]);
+    const [fetchingCategories, setFetchingCategories] = useState(false);
+
+    // Fetch categories on mount
+    React.useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            setFetchingCategories(true);
+            const response = await fetch(`${API_URL}/categories`);
+            const data = await response.json();
+            setCategories(data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+        } finally {
+            setFetchingCategories(false);
+        }
+    };
+
+    const toggleCategory = (catName: string) => {
+        const currentCats = formData.categories || [];
+        if (currentCats.includes(catName)) {
+            updateField('categories', currentCats.filter((c: string) => c !== catName));
+        } else {
+            updateField('categories', [...currentCats, catName]);
+        }
+    };
+
     const renderStep2 = () => (
         <View>
-            <Text style={styles.stepTitle}>Address Details</Text>
+            <Text style={styles.stepTitle}>Address & Work</Text>
+
+            <View style={styles.inputGroup}>
+                <Text style={styles.label}>Select Your Work Category *</Text>
+                <View style={styles.categoriesGrid}>
+                    {fetchingCategories ? (
+                        <ActivityIndicator color={colors.primary} />
+                    ) : (
+                        categories.map((cat) => {
+                            const isSelected = formData.categories?.includes(cat.name);
+                            return (
+                                <TouchableOpacity
+                                    key={cat._id}
+                                    style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
+                                    onPress={() => toggleCategory(cat.name)}
+                                >
+                                    <Text style={[styles.categoryText, isSelected && styles.categoryTextActive]}>
+                                        {cat.name}
+                                    </Text>
+                                    {isSelected && <Ionicons name="checkmark-circle" size={16} color="white" />}
+                                </TouchableOpacity>
+                            );
+                        })
+                    )}
+                </View>
+            </View>
 
             <View style={styles.inputGroup}>
                 <Text style={styles.label}>State</Text>
@@ -555,6 +634,34 @@ const styles = StyleSheet.create({
         color: colors.surface,
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    categoriesGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    categoryChip: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: colors.surface,
+        borderWidth: 1,
+        borderColor: colors.border,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    categoryChipActive: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
+    categoryText: {
+        fontSize: 14,
+        color: colors.text.secondary,
+        fontWeight: '600',
+    },
+    categoryTextActive: {
+        color: 'white',
     },
 });
 

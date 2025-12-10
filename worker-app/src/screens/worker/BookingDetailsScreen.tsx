@@ -200,22 +200,33 @@ const BookingDetailsScreen = () => {
 
     const handleOnlinePayment = async () => {
         try {
+            if (!booking?.finalPrice || booking.finalPrice <= 0) {
+                Alert.alert('Payment Error', 'Invalid order amount (₹0). Payment not required or error in price.');
+                return;
+            }
+
             // 1. Create Order
-            const orderResponse = await api.put(`/bookings/${bookingId}/payment`, {
-                paymentMethod: 'online_native'
-            });
+            let orderResponse;
+            try {
+                orderResponse = await api.put(`/bookings/${bookingId}/payment`, {
+                    paymentMethod: 'online_native'
+                });
+            } catch (apiError: any) {
+                console.error('API Creation Failed:', apiError);
+                Alert.alert('Server Error', apiError.response?.data?.message || 'Failed to create payment order on server.');
+                return;
+            }
 
             const { orderId, amount, key, booking: updatedBooking } = orderResponse.data;
 
             // 2. Open Razorpay Checkout
             if (!key) {
-                Alert.alert('Error', 'Payment Key missing from server');
+                Alert.alert('Configuration Error', 'Payment Key missing from server response. Contact support.');
                 return;
             }
 
             const options = {
                 description: `Payment for ${updatedBooking.service}`,
-                // image: 'https://your-logo-url.com/logo.png', // Removed to prevent load errors
                 currency: 'INR',
                 key: key,
                 amount: amount,
@@ -229,40 +240,42 @@ const BookingDetailsScreen = () => {
                 theme: { color: theme.colors.primary }
             };
 
-            console.log('Razorpay Options:', JSON.stringify(options));
-
             RazorpayCheckout.open(options).then(async (data: any) => {
                 // handle success
                 console.log(`Success: ${data.razorpay_payment_id}`);
 
                 // 3. Verify Payment
-                const verifyResponse = await api.put(`/bookings/${bookingId}/verify-payment`);
-                setBooking(verifyResponse.data.booking);
+                try {
+                    const verifyResponse = await api.put(`/bookings/${bookingId}/verify-payment`);
+                    setBooking(verifyResponse.data.booking);
 
-                setPaymentModalVisible(false);
-                Toast.show({
-                    type: 'success',
-                    text1: 'Payment Successful',
-                    text2: 'Proceed to complete job',
-                });
+                    setPaymentModalVisible(false);
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Payment Successful',
+                        text2: 'Proceed to complete job',
+                    });
+                } catch (verifyError: any) {
+                    Alert.alert('Verification Error', 'Payment verification failed on server. Please contact support.');
+                }
             }).catch((error: any) => {
                 // handle failure
                 console.log('Razorpay Error Object:', JSON.stringify(error));
-                console.log(`Error: ${error.code} | ${error.description}`);
-                Toast.show({
-                    type: 'error',
-                    text1: 'Payment Failed',
-                    text2: error.description || error.message || 'Payment was cancelled or failed',
-                });
+                let errorMsg = error.description || error.message || 'Payment cancelled or failed';
+                try {
+                    // Sometimes error.description is a JSON string
+                    if (typeof error.description === 'string' && error.description.startsWith('{')) {
+                        const parsed = JSON.parse(error.description);
+                        if (parsed.error && parsed.error.description) errorMsg = parsed.error.description;
+                    }
+                } catch (e) { }
+
+                Alert.alert('Payment Failed', errorMsg);
             });
 
         } catch (error: any) {
-            console.error('Online Payment Error:', error);
-            Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: error.response?.data?.message || 'Failed to initiate online payment',
-            });
+            console.error('Unexpected Online Payment Error:', error);
+            Alert.alert('Error', 'An unexpected error occurred.');
         }
     };
 

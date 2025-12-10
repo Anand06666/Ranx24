@@ -24,22 +24,29 @@ const WorkerEditModal = ({ worker, onClose, onRefresh }) => {
         assignedCities: worker.assignedCities ? [...worker.assignedCities] : [],
     });
     const [allCities, setAllCities] = useState([]);
+    const [availableServices, setAvailableServices] = useState([]);
 
-    // Fetch list of all cities for assignment
+    // Fetch list of all cities and services
     useEffect(() => {
-        const fetchCities = async () => {
+        const fetchData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const { data } = await axios.get(`${API_URL}/cities`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setAllCities(data);
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+
+                // Fetch Cities
+                const citiesRes = await axios.get(`${API_URL}/cities`, config);
+                setAllCities(citiesRes.data);
+
+                // Fetch Services
+                const servicesRes = await axios.get(`${API_URL}/services`, config);
+                setAvailableServices(servicesRes.data);
+
             } catch (err) {
-                console.error('Error fetching cities', err);
-                toast.error('Failed to load cities');
+                console.error('Error fetching data', err);
+                toast.error('Failed to load initial data');
             }
         };
-        fetchCities();
+        fetchData();
     }, []);
 
     const handleChange = (e) => {
@@ -53,9 +60,25 @@ const WorkerEditModal = ({ worker, onClose, onRefresh }) => {
             ...prev,
             services: [
                 ...prev.services,
-                { serviceName: '', categoryName: '', price: 0, isActive: true },
+                { serviceId: '', serviceName: '', categoryName: '', price: 0, isActive: true },
             ],
         }));
+    };
+
+    const handleServiceSelect = (index, serviceId) => {
+        const selectedService = availableServices.find(s => s._id === serviceId);
+        if (!selectedService) return;
+
+        const updated = [...formData.services];
+        updated[index] = {
+            ...updated[index],
+            serviceId: selectedService._id, // Store original service ID reference if needed
+            serviceName: selectedService.name,
+            categoryName: selectedService.category?.name || '',
+            price: selectedService.basePrice,
+            isActive: true
+        };
+        setFormData((prev) => ({ ...prev, services: updated }));
     };
 
     const updateService = (index, field, value) => {
@@ -333,17 +356,24 @@ const WorkerEditModal = ({ worker, onClose, onRefresh }) => {
                 <h3 className="text-xl font-semibold text-blue-800 mb-2">Services & Pricing</h3>
                 {formData.services.map((svc, idx) => (
                     <div key={idx} className="flex items-center gap-2 mb-2 border p-2 rounded bg-gray-50">
-                        <input
-                            placeholder="Service Name"
-                            value={svc.serviceName}
-                            onChange={(e) => updateService(idx, 'serviceName', e.target.value)}
+                        <select
                             className="border p-1 rounded flex-1"
-                        />
+                            value={availableServices.find(s => s.name === svc.serviceName)?._id || ''}
+                            onChange={(e) => handleServiceSelect(idx, e.target.value)}
+                        >
+                            <option value="">Select Service</option>
+                            {availableServices.map(s => (
+                                <option key={s._id} value={s._id}>
+                                    {s.name}
+                                </option>
+                            ))}
+                        </select>
+
                         <input
                             placeholder="Category"
                             value={svc.categoryName}
-                            onChange={(e) => updateService(idx, 'categoryName', e.target.value)}
-                            className="border p-1 rounded flex-1"
+                            readOnly
+                            className="border p-1 rounded flex-1 bg-gray-100"
                         />
                         <input
                             type="number"

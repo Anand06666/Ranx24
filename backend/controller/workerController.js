@@ -701,7 +701,11 @@ export const updateWorkerDetails = async (req, res) => {
       worker.services = services || worker.services;
       worker.status = status || worker.status;
       worker.workerType = workerType || worker.workerType;
+      worker.status = status || worker.status;
+      worker.workerType = workerType || worker.workerType;
       worker.price = price || worker.price; // New: Update price
+      worker.bankDetails = req.body.bankDetails || worker.bankDetails; // New
+      worker.upiId = req.body.upiId || worker.upiId; // New
 
       if (latitude && longitude) {
         worker.location = {
