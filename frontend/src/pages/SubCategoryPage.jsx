@@ -13,6 +13,7 @@ export default function SubCategoryPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [subCategoryName, setSubCategoryName] = useState('');
     const [selectedServiceDesc, setSelectedServiceDesc] = useState(null);
 
     useEffect(() => {
