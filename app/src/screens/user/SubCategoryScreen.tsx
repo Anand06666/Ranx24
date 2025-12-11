@@ -30,6 +30,10 @@ const SubCategoryScreen = () => {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [selectedTime, setSelectedTime] = useState<string>('10:00 AM');
 
+    // Description Modal State
+    const [descriptionModalVisible, setDescriptionModalVisible] = useState(false);
+    const [selectedDescService, setSelectedDescService] = useState<any>(null);
+
     useEffect(() => {
         if (subCategoryId) {
             fetchServices();
@@ -129,7 +133,22 @@ const SubCategoryScreen = () => {
                 <View style={styles.infoContainer}>
                     <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
                     <Text style={[styles.price, { color: colors.primary }]}>₹{item.basePrice} / {item.priceUnit}</Text>
-                    <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+                    <Text style={[styles.description, { color: colors.textSecondary }]}>
+                        {item.description?.length > 80 ? (
+                            <>
+                                {item.description.substring(0, 80)}...
+                                <Text
+                                    style={{ color: colors.primary, fontWeight: 'bold' }}
+                                    onPress={() => {
+                                        setSelectedDescService(item);
+                                        setDescriptionModalVisible(true);
+                                    }}
+                                >
+                                    See More
+                                </Text>
+                            </>
+                        ) : item.description}
+                    </Text>
                 </View>
             </TouchableOpacity>
 
@@ -275,6 +294,67 @@ const SubCategoryScreen = () => {
                         >
                             <Text style={styles.confirmBtnText}>Proceed to Checkout</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            {/* Description Modal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={descriptionModalVisible}
+                onRequestClose={() => setDescriptionModalVisible(false)}
+            >
+                <View style={[styles.modalOverlay, { justifyContent: 'center', padding: 20 }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card, borderRadius: 20, maxHeight: '70%', padding: 0 }]}>
+                        {selectedDescService && (
+                            <>
+                                <View style={{ height: 200, width: '100%' }}>
+                                    <Image
+                                        source={{
+                                            uri: selectedDescService.image
+                                                ? `${API_URL.replace('/api', '')}/${selectedDescService.image.replace(/\\/g, '/')}`
+                                                : 'https://via.placeholder.com/150'
+                                        }}
+                                        style={{ width: '100%', height: '100%' }}
+                                        resizeMode="cover"
+                                    />
+                                    <TouchableOpacity
+                                        style={{ position: 'absolute', top: 15, right: 15, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 20, padding: 5 }}
+                                        onPress={() => setDescriptionModalVisible(false)}
+                                    >
+                                        <Ionicons name="close" size={24} color="#FFF" />
+                                    </TouchableOpacity>
+                                </View>
+
+                                <ScrollView style={{ padding: 20 }}>
+                                    <Text style={[styles.modalTitle, { color: colors.text, marginBottom: 8 }]}>{selectedDescService.name}</Text>
+                                    <View style={{ flexDirection: 'row', marginBottom: 16 }}>
+                                        <View style={{ backgroundColor: colors.primary + '20', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
+                                            <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 12 }}>
+                                                ₹{selectedDescService.basePrice} / {selectedDescService.priceUnit}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textSecondary, textTransform: 'uppercase', marginBottom: 8 }}>
+                                        Description
+                                    </Text>
+                                    <Text style={{ fontSize: 16, lineHeight: 24, color: colors.text, marginBottom: 30 }}>
+                                        {selectedDescService.description}
+                                    </Text>
+
+                                    <TouchableOpacity
+                                        style={[styles.bookBtn, { backgroundColor: colors.primary, padding: 16, borderRadius: 12, alignItems: 'center', marginBottom: 20 }]}
+                                        onPress={() => {
+                                            setDescriptionModalVisible(false);
+                                            openBookingModal(selectedDescService);
+                                        }}
+                                    >
+                                        <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 16 }}>Book Now</Text>
+                                    </TouchableOpacity>
+                                </ScrollView>
+                            </>
+                        )}
                     </View>
                 </View>
             </Modal>

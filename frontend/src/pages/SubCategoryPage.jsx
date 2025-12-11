@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosConfig';
 import { useCart } from '../context/CartContext';
 import toast from 'react-hot-toast';
-import { LucideSearch, LucideArrowLeft, LucideCheck, LucideClock } from 'lucide-react';
+import { LucideSearch, LucideArrowLeft, LucideCheck, LucideClock, LucideX } from 'lucide-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://backend.ranx24.com';
 
@@ -13,7 +13,7 @@ export default function SubCategoryPage() {
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [subCategoryName, setSubCategoryName] = useState('');
+    const [selectedServiceDesc, setSelectedServiceDesc] = useState(null);
 
     useEffect(() => {
         fetchServices();
@@ -133,9 +133,24 @@ export default function SubCategoryPage() {
                                         </span>
                                     </div>
 
-                                    <p className="text-gray-500 text-sm mb-4 line-clamp-2 flex-grow">
-                                        {service.description || 'Professional service with verified experts.'}
-                                    </p>
+                                    <div className="mb-4 flex-grow">
+                                        <p className="text-gray-500 text-sm">
+                                            {service.description?.length > 80
+                                                ? `${service.description.substring(0, 80)}... `
+                                                : (service.description || 'Professional service with verified experts.')}
+                                            {service.description?.length > 80 && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedServiceDesc(service);
+                                                    }}
+                                                    className="text-blue-600 font-semibold hover:underline text-xs"
+                                                >
+                                                    See More
+                                                </button>
+                                            )}
+                                        </p>
+                                    </div>
 
                                     <div className="space-y-2 mb-4">
                                         <div className="flex items-center text-xs text-gray-500">
@@ -184,6 +199,60 @@ export default function SubCategoryPage() {
                     </button>
                 </div>
             </div>
+            {/* Description Modal */}
+            {selectedServiceDesc && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setSelectedServiceDesc(null)}>
+                    <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-fade-in-up" onClick={e => e.stopPropagation()}>
+                        <div className="relative h-48 bg-gray-100">
+                            <img
+                                src={`${SERVER_URL}/${selectedServiceDesc.image?.replace(/\\/g, '/')}`}
+                                alt={selectedServiceDesc.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.src = 'https://placehold.co/1500?text=Service'; }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                            <button
+                                onClick={() => setSelectedServiceDesc(null)}
+                                className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full p-2 text-white transition-colors"
+                            >
+                                <LucideX size={20} />
+                            </button>
+                            <div className="absolute bottom-4 left-4 text-white">
+                                <h3 className="text-2xl font-bold">{selectedServiceDesc.name}</h3>
+                                <span className="inline-block mt-2 bg-blue-600 px-3 py-1 rounded-full text-xs font-bold">
+                                    ₹{selectedServiceDesc.basePrice}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="p-6 max-h-[60vh] overflow-y-auto">
+                            <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-2">Description</h4>
+                            <p className="text-gray-700 leading-relaxed text-lg">
+                                {selectedServiceDesc.description || 'No description available for this service.'}
+                            </p>
+
+                            <div className="mt-8 flex gap-3">
+                                <button
+                                    onClick={() => {
+                                        handleQuickAddToCart(selectedServiceDesc);
+                                        setSelectedServiceDesc(null);
+                                    }}
+                                    className="flex-1 border border-blue-600 text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-50 transition-colors"
+                                >
+                                    Add to Cart
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigate(`/book-worker/service?serviceId=${selectedServiceDesc._id}&service=${encodeURIComponent(selectedServiceDesc.name)}&category=${encodeURIComponent(selectedServiceDesc.category?.name || '')}`);
+                                    }}
+                                    className="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                                >
+                                    Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

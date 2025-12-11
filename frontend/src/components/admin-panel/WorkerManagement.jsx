@@ -268,9 +268,9 @@ const WorkerManagement = () => {
                   </div>
                 </td>
                 <td className="px-3 py-3 text-center">
-                  {worker.aadhaarCard ? (
+                  {worker.aadhaarFront || worker.aadhaarCard ? (
                     <a
-                      href={`${API_URL_BASE}/${worker.aadhaarCard}`}
+                      href={`${API_URL_BASE}/uploads/${worker.aadhaarFront || worker.aadhaarCard}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs hover:bg-blue-200 font-semibold transition shadow"
