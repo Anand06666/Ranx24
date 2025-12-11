@@ -213,6 +213,32 @@ const UserPage = () => {
         </div>
       )}
 
+      {/* Banners Section */}
+      {banners.length > 0 && (
+        <section className="py-10 container mx-auto px-4">
+          <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide snap-x">
+            {banners.map((banner) => (
+              <div key={banner._id} className="min-w-[300px] md:min-w-[600px] h-[150px] md:h-[300px] rounded-2xl overflow-hidden shadow-lg flex-shrink-0 snap-center relative group">
+                <a href={banner.link || '#'} target="_blank" rel="noopener noreferrer" className="block w-full h-full">
+                  <img
+                    src={`${SERVER_URL}/${banner.image}`}
+                    alt={banner.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/600x300?text=' + banner.title; }}
+                  />
+                  {(banner.title || banner.description) && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                      {banner.title && <h3 className="font-bold text-lg">{banner.title}</h3>}
+                      {banner.description && <p className="text-sm opacity-90">{banner.description}</p>}
+                    </div>
+                  )}
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Categories Section */}
       <section className="py-16 container mx-auto px-4">
         <div className="flex justify-between items-end mb-10">

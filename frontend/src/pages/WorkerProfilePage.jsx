@@ -268,19 +268,24 @@ export default function WorkerProfilePage() {
                     </p>
                 </Card>
 
-                {/* Services Section */}
+                {/* Services/Categories Section */}
                 <Card className="mb-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Services Offered</h2>
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">
+                        {(worker.services && worker.services.length > 0) ? "Services Offered" : "Categories"}
+                    </h2>
                     <div className="flex flex-wrap gap-2">
-                        {worker.services?.map((service, index) => (
+                        {((worker.services && worker.services.length > 0) ? worker.services : (worker.categories || [])).map((item, index) => (
                             <span
                                 key={index}
                                 className="px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium flex items-center gap-2"
                             >
                                 <FaBriefcase className="text-xs" />
-                                {service.name || service}
+                                {item.name || item}
                             </span>
                         ))}
+                        {(!worker.services?.length && !worker.categories?.length) && (
+                            <span className="text-gray-500 italic">No services or categories listed</span>
+                        )}
                     </div>
                 </Card>
 

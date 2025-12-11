@@ -47,9 +47,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="bg-blue-600 rounded-lg p-1.5 transition-transform group-hover:scale-105">
-              <img src={logo} alt="RanX24" className="h-6 w-auto brightness-0 invert" />
-            </div>
+            <img src={logo} alt="RanX24" className="h-10 w-auto transition-transform group-hover:scale-105" />
             <span className={`text-2xl font-bold tracking-tight ${isScrolled ? 'text-gray-900' : 'text-gray-900'}`}>
               RanX<span className="text-blue-600">24</span>
             </span>

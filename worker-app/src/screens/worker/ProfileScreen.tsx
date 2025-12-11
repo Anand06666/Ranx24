@@ -184,35 +184,84 @@ const ProfileScreen = ({ navigation }: any) => {
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Documents</Text>
+                    <Text style={styles.sectionTitle}>Verification Documents</Text>
                     <View style={styles.card}>
                         <InfoRow
                             icon="card-outline"
                             label="Aadhaar Number"
                             value={worker?.aadhaarNumber || 'N/A'}
                         />
+                        {/* Aadhaar Front Image */}
+                        <View style={styles.documentRow}>
+                            <Text style={styles.documentLabel}>Aadhaar Front</Text>
+                            {worker?.aadhaarFront ? (
+                                <TouchableOpacity style={styles.documentImageContainer}>
+                                    <Image
+                                        source={{ uri: `${API_URL.replace('/api', '')}/uploads/${worker.aadhaarFront}` }}
+                                        style={styles.documentImage}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <Text style={styles.notUploaded}>Not Uploaded</Text>
+                            )}
+                        </View>
+
+                        {/* Aadhaar Back Image */}
+                        <View style={styles.documentRow}>
+                            <Text style={styles.documentLabel}>Aadhaar Back</Text>
+                            {worker?.aadhaarBack ? (
+                                <TouchableOpacity style={styles.documentImageContainer}>
+                                    <Image
+                                        source={{ uri: `${API_URL.replace('/api', '')}/uploads/${worker.aadhaarBack}` }}
+                                        style={styles.documentImage}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <Text style={styles.notUploaded}>Not Uploaded</Text>
+                            )}
+                        </View>
+
                         <InfoRow
                             icon="document-text-outline"
                             label="PAN Number"
                             value={worker?.panNumber || 'Not Provided'}
                         />
+                        {/* PAN Card Image */}
+                        <View style={[styles.documentRow, { borderBottomWidth: 0 }]}>
+                            <Text style={styles.documentLabel}>PAN Card</Text>
+                            {worker?.panCard ? (
+                                <TouchableOpacity style={styles.documentImageContainer}>
+                                    <Image
+                                        source={{ uri: `${API_URL.replace('/api', '')}/uploads/${worker.panCard}` }}
+                                        style={styles.documentImage}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            ) : (
+                                <Text style={styles.notUploaded}>Not Uploaded</Text>
+                            )}
+                        </View>
                     </View>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Services Offered</Text>
+                    <Text style={styles.sectionTitle}>
+                        {(worker?.services && worker.services.length > 0) ? "Services Offered" : "Work Categories"}
+                    </Text>
                     <View style={styles.card}>
-                        {worker?.services && worker.services.length > 0 ? (
+                        {((worker?.services && worker.services.length > 0) ? worker.services : (worker?.categories || [])).length > 0 ? (
                             <View style={styles.servicesGrid}>
-                                {worker.services.map((service, index) => (
+                                {((worker?.services && worker.services.length > 0) ? worker.services : (worker?.categories || [])).map((item: any, index: number) => (
                                     <View key={index} style={styles.serviceChip}>
-                                        <Ionicons name="checkmark-circle" size={16} color={theme.colors.primary} />
-                                        <Text style={styles.serviceText}>{service}</Text>
+                                        <Ionicons name="briefcase-outline" size={16} color={theme.colors.primary} />
+                                        <Text style={styles.serviceText}>{item.name || item}</Text>
                                     </View>
                                 ))}
                             </View>
                         ) : (
-                            <Text style={styles.emptyText}>No services added</Text>
+                            <Text style={styles.emptyText}>No categories added</Text>
                         )}
                     </View>
                 </View>
@@ -637,6 +686,37 @@ const styles = StyleSheet.create({
         color: theme.colors.text.secondary,
         marginBottom: 4,
         fontWeight: '500',
+    },
+    documentRow: {
+        marginBottom: theme.spacing.m,
+        paddingBottom: theme.spacing.m,
+        borderBottomWidth: 1,
+        borderBottomColor: theme.colors.background,
+    },
+    documentLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: theme.colors.text.secondary,
+        marginBottom: 8,
+    },
+    documentImageContainer: {
+        height: 180,
+        width: '100%',
+        borderRadius: theme.borderRadius.m,
+        overflow: 'hidden',
+        backgroundColor: theme.colors.background,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    documentImage: {
+        width: '100%',
+        height: '100%',
+    },
+    notUploaded: {
+        fontSize: 14,
+        color: theme.colors.text.tertiary,
+        fontStyle: 'italic',
+        paddingVertical: 8,
     },
 });
 
