@@ -1849,6 +1849,8 @@ export const assignWorker = async (req, res) => {
     if (!worker) {
       return res.status(404).json({ message: 'Worker not found' });
     }
+    console.log(`[AssignWorker] Assigning Booking ${id} to Worker: ${worker.firstName} (${worker._id})`);
+    console.log(`[AssignWorker] Worker FCM Token: ${worker.fcmToken ? worker.fcmToken.substring(0, 15) + '...' : 'None'}`);
 
     // Check availability
     const bookingDateObj = new Date(booking.bookingDate);

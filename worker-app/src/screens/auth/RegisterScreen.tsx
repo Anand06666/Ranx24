@@ -24,6 +24,7 @@ const { colors, spacing, shadows } = theme;
 interface RegisterFormData {
     firstName: string;
     lastName: string;
+    email: string; // Added email
     mobileNumber: string;
     password: string;
     confirmPassword: string;
@@ -44,6 +45,7 @@ const RegisterScreen = ({ navigation }: any) => {
         firstName: '',
         lastName: '',
         mobileNumber: '',
+        email: '',
         password: '',
         confirmPassword: '',
         state: '',
@@ -79,12 +81,17 @@ const RegisterScreen = ({ navigation }: any) => {
     };
 
     const validateStep1 = () => {
-        if (!formData.firstName || !formData.lastName || !formData.mobileNumber || !formData.password) {
+        if (!formData.firstName || !formData.lastName || !formData.mobileNumber || !formData.email || !formData.password) {
             Alert.alert('Missing Fields', 'Please fill all required fields');
             return false;
         }
         if (formData.mobileNumber.length !== 10) {
             Alert.alert('Invalid Mobile', 'Please enter a valid 10-digit mobile number');
+            return false;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            Alert.alert('Invalid Email', 'Please enter a valid email address');
             return false;
         }
         if (formData.password !== formData.confirmPassword) {
@@ -273,6 +280,18 @@ const RegisterScreen = ({ navigation }: any) => {
                     maxLength={10}
                     value={formData.mobileNumber}
                     onChangeText={(val) => updateField('mobileNumber', val)}
+                />
+            </View>
+
+            <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter email address"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={formData.email}
+                    onChangeText={(val) => updateField('email', val)}
                 />
             </View>
 

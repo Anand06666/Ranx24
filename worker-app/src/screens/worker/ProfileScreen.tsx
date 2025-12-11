@@ -21,8 +21,18 @@ import { theme } from '../../theme/theme';
 import { ImageSkeleton } from '../../components/SkeletonLoader';
 
 const ProfileScreen = ({ navigation }: any) => {
-    const { worker, logout, refreshWorker } = useAuth(); // Assuming refreshWorker exists
+    const { worker, logout, refreshWorker } = useAuth();
     const [imageLoading, setImageLoading] = useState(true);
+
+    // Edit Profile State
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [newEmail, setNewEmail] = useState(worker?.email || '');
+    const [updatingProfile, setUpdatingProfile] = useState(false);
+
+    // Initial email set effect
+    React.useEffect(() => {
+        if (worker?.email) setNewEmail(worker.email);
+    }, [worker]);
 
     // Payout State
     const [isEditingPayout, setIsEditingPayout] = useState(false);
@@ -48,17 +58,6 @@ const ProfileScreen = ({ navigation }: any) => {
         try {
             if (!worker) return;
             setSavingPayout(true);
-            const token = ''; // Get token from storage or context if needed, but context usually handles auth header in axios interceptor if configured.
-            // But here raw axios is used? No, api service.
-            // Let's use `api` service instead of axios directly if possible, but file imports `API_URL` only.
-            // I'll import `api` default as well.
-
-            // Actually existing imports: `import { API_URL } from '../../services/api';`
-            // I should import `api` from `../../services/api`
-
-            // For now, let's assume `api` handles token.
-            // I'll add `import api from '../../services/api';` to top via this replacement too.
-
             await api.put(`/workers/${worker._id}`, {
                 bankDetails: payoutForm.bankDetails,
                 upiId: payoutForm.upiId
@@ -66,12 +65,33 @@ const ProfileScreen = ({ navigation }: any) => {
 
             Alert.alert('Success', 'Payout details updated successfully');
             setIsEditingPayout(false);
-            if (refreshWorker) refreshWorker(); // Refresh context
+            if (refreshWorker) refreshWorker();
         } catch (error) {
             console.error('Error updating payout details:', error);
             Alert.alert('Error', 'Failed to update details');
         } finally {
             setSavingPayout(false);
+        }
+    };
+
+    const handleUpdateProfile = async () => {
+        if (!newEmail || !newEmail.includes('@')) {
+            Alert.alert('Error', 'Please enter a valid email address');
+            return;
+        }
+
+        if (!worker) return;
+
+        try {
+            setUpdatingProfile(true);
+            await api.put(`/workers/${worker._id}`, { email: newEmail });
+            Alert.alert('Success', 'Profile updated successfully');
+            setIsEditingProfile(false);
+            if (refreshWorker) refreshWorker();
+        } catch (error: any) {
+            Alert.alert('Error', error.response?.data?.message || 'Failed to update profile');
+        } finally {
+            setUpdatingProfile(false);
         }
     };
 
@@ -99,53 +119,92 @@ const ProfileScreen = ({ navigation }: any) => {
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Profile Header */}
                 <View style={styles.profileHeader}>
-                    <View style={styles.imageContainer}>
-                        {imageLoading && <ImageSkeleton size={110} />}
-                        {worker?.livePhoto ? (
-                            <Image
-                                source={{
-                                    uri: `${API_URL.replace('/api', '')}/uploads/${worker.livePhoto}`,
-                                }}
-                                style={[styles.profileImage, imageLoading && { display: 'none' }]}
-                                onLoadEnd={() => setImageLoading(false)}
-                            />
-                        ) : (
-                            <View style={styles.profileImagePlaceholder}>
-                                <Ionicons name="person" size={48} color={theme.colors.text.tertiary} />
-                            </View>
-                        )}
-                        <View style={styles.editIconContainer}>
-                            <Ionicons name="camera" size={14} color="white" />
+                    <View style={styles.headerTopRow}>
+                        <View style={styles.imageContainer}>
+                            {imageLoading && <ImageSkeleton size={100} />}
+                            {worker?.livePhoto ? (
+                                <Image
+                                    source={{ uri: `${API_URL.replace(/\/api\/?$/, '')}/uploads/${worker.livePhoto}` }}
+                                    style={[styles.profileImage, imageLoading && { display: 'none' }]}
+                                    onLoadEnd={() => setImageLoading(false)}
+                                    onError={(e) => console.log('Image Load Error:', e.nativeEvent.error)}
+                                />
+                            ) : (
+                                <View style={styles.profileImagePlaceholder}>
+                                    <Ionicons name="person" size={40} color={theme.colors.text.tertiary} />
+                                </View>
+                            )}
                         </View>
-                    </View>
-
-                    <Text style={styles.name}>
-                        {worker?.firstName} {worker?.lastName}
-                    </Text>
-                    <Text style={styles.phone}>{worker?.mobileNumber}</Text>
-
-                    <View
-                        style={[
-                            styles.statusBadge,
-                            {
-                                backgroundColor:
-                                    worker?.status === 'approved' ? '#ECFDF5' : '#FFFBEB',
-                            },
-                        ]}
-                    >
-                        <View style={[styles.statusDot, { backgroundColor: worker?.status === 'approved' ? theme.colors.success : theme.colors.warning }]} />
-                        <Text
-                            style={[
-                                styles.statusText,
-                                {
-                                    color: worker?.status === 'approved' ? theme.colors.success : theme.colors.warning,
-                                },
-                            ]}
-                        >
-                            {worker?.status?.toUpperCase()}
-                        </Text>
+                        <View style={{ flex: 1, justifyContent: 'center' }}>
+                            <Text style={styles.name}>
+                                {worker?.firstName} {worker?.lastName}
+                            </Text>
+                            <Text style={styles.phone}>{worker?.mobileNumber}</Text>
+                            <View
+                                style={[
+                                    styles.statusBadge,
+                                    {
+                                        backgroundColor:
+                                            worker?.status === 'approved' ? theme.colors.success + '20' : theme.colors.warning + '20',
+                                        alignSelf: 'flex-start'
+                                    },
+                                ]}
+                            >
+                                <View style={[styles.statusDot, { backgroundColor: worker?.status === 'approved' ? theme.colors.success : theme.colors.warning }]} />
+                                <Text
+                                    style={[
+                                        styles.statusText,
+                                        {
+                                            color: worker?.status === 'approved' ? theme.colors.success : theme.colors.warning,
+                                        },
+                                    ]}
+                                >
+                                    {worker?.status?.toUpperCase()}
+                                </Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity style={styles.miniEditButton} onPress={() => setIsEditingProfile(true)}>
+                            <Ionicons name="create-outline" size={20} color={theme.colors.primary} />
+                        </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* Edit Profile Modal (Inline for simplicity) */}
+                {isEditingProfile && (
+                    <View style={styles.editModalContainer}>
+                        <View style={styles.editModalContent}>
+                            <Text style={styles.modalTitle}>Edit Profile</Text>
+                            <Text style={styles.label}>Email Address</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={newEmail}
+                                onChangeText={setNewEmail}
+                                placeholder="Enter specific email"
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                            />
+                            <View style={styles.modalActions}>
+                                <TouchableOpacity
+                                    style={[styles.modalButton, styles.cancelButton]}
+                                    onPress={() => setIsEditingProfile(false)}
+                                >
+                                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.modalButton, styles.saveButton]}
+                                    onPress={handleUpdateProfile}
+                                    disabled={updatingProfile}
+                                >
+                                    {updatingProfile ? (
+                                        <ActivityIndicator color="white" size="small" />
+                                    ) : (
+                                        <Text style={styles.saveButtonText}>Save</Text>
+                                    )}
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                )}
 
                 {/* Performance Stats */}
                 <View style={styles.statsContainer}>
@@ -173,6 +232,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Personal Information</Text>
                     <View style={styles.card}>
+                        <InfoRow icon="mail-outline" label="Email" value={worker?.email || 'N/A'} />
                         <InfoRow icon="location-outline" label="City" value={worker?.city || 'N/A'} />
                         <InfoRow
                             icon="map-outline"
@@ -440,45 +500,44 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     profileHeader: {
-        alignItems: 'center',
-        paddingVertical: theme.spacing.xl,
+        paddingHorizontal: theme.spacing.m,
+        paddingVertical: theme.spacing.l,
         marginBottom: theme.spacing.s,
+    },
+    headerTopRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: theme.spacing.m,
     },
     imageContainer: {
         position: 'relative',
-        marginBottom: theme.spacing.m,
         ...theme.shadows.medium,
     },
     profileImage: {
-        width: 110,
-        height: 110,
-        borderRadius: 55,
-        borderWidth: 4,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 2,
         borderColor: theme.colors.surface,
     },
     profileImagePlaceholder: {
-        width: 110,
-        height: 110,
-        borderRadius: 55,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: theme.colors.surface,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 4,
-        borderColor: theme.colors.surface,
+        borderWidth: 2,
+        borderColor: theme.colors.border,
     },
-    editIconContainer: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: theme.colors.primary,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 3,
-        borderColor: theme.colors.background,
+    miniEditButton: {
+        padding: 8,
+        borderRadius: 20,
+        backgroundColor: theme.colors.surface,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
     },
+
     name: {
         ...theme.typography.h2,
         color: theme.colors.text.primary,
@@ -711,6 +770,51 @@ const styles = StyleSheet.create({
     documentImage: {
         width: '100%',
         height: '100%',
+    },
+    editModalContainer: {
+        marginBottom: theme.spacing.l,
+        marginHorizontal: theme.spacing.m,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.borderRadius.l,
+        padding: theme.spacing.m,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        ...theme.shadows.medium,
+    },
+    editModalContent: {
+        gap: 12,
+    },
+    modalTitle: {
+        ...theme.typography.h3,
+        marginBottom: 8,
+    },
+    modalActions: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 8,
+    },
+    modalButton: {
+        flex: 1,
+        paddingVertical: 10,
+        borderRadius: theme.borderRadius.m,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    cancelButton: {
+        backgroundColor: theme.colors.background,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+    },
+    saveButton: {
+        backgroundColor: theme.colors.primary,
+    },
+    cancelButtonText: {
+        color: theme.colors.text.secondary,
+        fontWeight: '600',
+    },
+    saveButtonText: {
+        color: 'white',
+        fontWeight: '600',
     },
     notUploaded: {
         fontSize: 14,

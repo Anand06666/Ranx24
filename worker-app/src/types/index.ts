@@ -4,6 +4,7 @@ export interface Worker {
     lastName: string;
     name?: string;
     mobileNumber: string;
+    email: string;
     state: string;
     district: string;
     city: string;
@@ -11,7 +12,9 @@ export interface Worker {
     longitude?: string;
     livePhoto: string;
     aadhaarNumber: string;
-    aadhaarCard: string;
+    aadhaarFront?: string; // New field
+    aadhaarBack?: string; // New field
+    aadhaarCard: string; // Legacy
     panNumber?: string;
     panCard?: string;
     categories: string[];

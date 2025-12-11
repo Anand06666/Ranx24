@@ -171,17 +171,18 @@ export const registerWorker = async (req, res) => {
     firstName,
     lastName,
     mobileNumber,
+    email, // Added email
     state,
     district,
     city,
-    latitude, // Added latitude
-    longitude, // Added longitude
-    aadhaarNumber, // New
-    panNumber, // New
+    latitude,
+    longitude,
+    aadhaarNumber,
+    panNumber,
     categories,
     services,
-    price, // Keep for backward compatibility
-    password, // Added password
+    price,
+    password,
   } = req.body;
 
   let { servicePricing } = req.body;
@@ -210,6 +211,10 @@ export const registerWorker = async (req, res) => {
     return res.status(400).json({ message: 'Password is required' });
   }
 
+  if (!email) {
+    return res.status(400).json({ message: 'Email is required' });
+  }
+
   const livePhoto = req.files.livePhoto[0].filename;
   const aadhaarFront = req.files.aadhaarFront[0].filename;
   const aadhaarBack = req.files.aadhaarBack[0].filename;
@@ -220,6 +225,11 @@ export const registerWorker = async (req, res) => {
 
     if (workerExists) {
       return res.status(400).json({ message: 'Worker already exists with this mobile number' });
+    }
+
+    const emailExists = await Worker.findOne({ email });
+    if (emailExists) {
+      return res.status(400).json({ message: 'Worker already exists with this email' });
     }
 
     // Validate servicePricing if provided
@@ -252,6 +262,7 @@ export const registerWorker = async (req, res) => {
       firstName,
       lastName,
       mobileNumber,
+      email, // Added email
       state,
       district,
       city,
@@ -687,10 +698,12 @@ export const updateWorkerDetails = async (req, res) => {
     }
 
     const worker = await Worker.findById(req.params.id);
+    const { email } = req.body;
 
     if (worker) {
       worker.firstName = firstName || worker.firstName;
       worker.lastName = lastName || worker.lastName;
+      worker.email = email || worker.email;
       worker.mobileNumber = mobileNumber || worker.mobileNumber;
       worker.state = state || worker.state;
       worker.district = district || worker.district;

@@ -97,37 +97,51 @@ export const sendBroadcastNotification = async (req, res) => {
         if (tokens.length === 0) {
             return res.status(404).json({ message: 'No active users found to send notification' });
         }
-
+        console.log(`[Broadcast] Found ${tokens.length} tokens. Sample: ${tokens[0].substring(0, 10)}...`);
         console.log(`📢 Sending broadcast to ${tokens.length} ${recipientModel}s`);
 
-        // 2. Send Multicast FCM
+        // 2. Send Multicast FCM (Batched)
         if (firebaseApp) {
-            const messagePayload = {
-                notification: {
-                    title,
-                    body: message,
-                },
-                tokens: tokens, // Multicast
-                android: {
-                    priority: 'high',
+            const chunkSize = 500; // Firebase limit
+            let successCount = 0;
+            let failureCount = 0;
+
+            for (let i = 0; i < tokens.length; i += chunkSize) {
+                const chunk = tokens.slice(i, i + chunkSize);
+
+                const messagePayload = {
                     notification: {
-                        channelId: 'default',
-                        sound: 'default'
+                        title,
+                        body: message,
+                    },
+                    tokens: chunk, // Multicast to this chunk
+                    android: {
+                        priority: 'high',
+                        notification: {
+                            channelId: 'default',
+                            sound: 'default'
+                        }
+                    },
+                    data: {
+                        type: 'broadcast',
+                        image: image || ''
                     }
-                },
-                data: {
-                    type: 'broadcast',
-                    image: image || ''
+                };
+
+                if (image) {
+                    messagePayload.notification.imageUrl = image;
                 }
-            };
 
-            if (image) {
-                messagePayload.notification.imageUrl = image;
+                try {
+                    const response = await firebaseApp.messaging().sendEachForMulticast(messagePayload);
+                    successCount += response.successCount;
+                    failureCount += response.failureCount;
+                    console.log(`Batch ${i / chunkSize + 1}: ${response.successCount} success, ${response.failureCount} fail`);
+                } catch (batchError) {
+                    console.error(`Error sending batch ${i / chunkSize + 1}:`, batchError);
+                }
             }
-
-            const response = await firebaseApp.messaging().sendEachForMulticast(messagePayload);
-
-            console.log(`✅ Broadcast sent: ${response.successCount} successes, ${response.failureCount} failures`);
+            console.log(`✅ Total Broadcast sent: ${successCount} successes, ${failureCount} failures`);
         }
 
         // 3. Create Notification records (Optional: might be heavy for thousands of users, but good for history)

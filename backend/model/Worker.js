@@ -16,6 +16,11 @@ const workerSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   state: {
     type: String,
     required: true,
@@ -50,15 +55,12 @@ const workerSchema = new mongoose.Schema({
   },
   aadhaarNumber: { // New
     type: String,
-    required: true,
   },
   aadhaarFront: { // New
     type: String, // URL to the uploaded image
-    required: true,
   },
   aadhaarBack: { // New
     type: String, // URL to the uploaded image
-    required: true,
   },
   panNumber: { // New
     type: String,

@@ -16,6 +16,11 @@ export default function PersonalDetailsStep({ formData, updateFormData, handleNe
     } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
       newErrors.mobileNumber = 'Mobile Number must be 10 digits.';
     }
+    if (!formData.email) {
+      newErrors.email = 'Email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format.';
+    }
     if (!formData.password) {
       newErrors.password = 'Password is required.';
     } else if (formData.password.length < 6) {
@@ -74,6 +79,19 @@ export default function PersonalDetailsStep({ formData, updateFormData, handleNe
           className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
         {errors.mobileNumber && <p className="text-red-500 text-xs italic mt-1">{errors.mobileNumber}</p>}
+      </div>
+
+      <div className="mt-6">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          value={formData.email || ''}
+          onChange={(e) => { updateFormData({ email: e.target.value }); setErrors(prev => ({ ...prev, email: '' })); }}
+          placeholder="Enter your email address"
+          className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        />
+        {errors.email && <p className="text-red-500 text-xs italic mt-1">{errors.email}</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">

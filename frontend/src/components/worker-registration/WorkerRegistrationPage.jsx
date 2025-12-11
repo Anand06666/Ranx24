@@ -30,6 +30,7 @@ export default function WorkerRegistrationPage() {
     firstName: "",
     lastName: "",
     mobileNumber: "",
+    email: "", // Added email
     password: "", // Added
     confirmPassword: "", // Added
     livePhoto: null,
@@ -64,6 +65,7 @@ export default function WorkerRegistrationPage() {
     data.append("firstName", formData.firstName);
     data.append("lastName", formData.lastName);
     data.append("mobileNumber", formData.mobileNumber);
+    data.append("email", formData.email); // Added email
     data.append("state", formData.state);
     data.append("district", formData.district);
     data.append("city", formData.city);
