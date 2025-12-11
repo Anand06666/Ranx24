@@ -136,7 +136,7 @@ const ChatScreen = ({ navigation, route }) => {
             uri,
             name: 'image.jpg',
             type: 'image/jpeg',
-        });
+        } as any);
 
         try {
             const response = await api.post('/chat/upload', formData, {

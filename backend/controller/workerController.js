@@ -200,10 +200,10 @@ export const registerWorker = async (req, res) => {
   console.log('req.files:', req.files);
   console.log('req.body:', req.body);
 
-  if (!req.files || !req.files.livePhoto || !req.files.aadhaarCard) { // Changed idProof to aadhaarCard
+  if (!req.files || !req.files.livePhoto || !req.files.aadhaarFront || !req.files.aadhaarBack) {
     console.log('Missing files!');
     console.log('req.files:', req.files);
-    return res.status(400).json({ message: 'Please upload live photo and Aadhaar card.' });
+    return res.status(400).json({ message: 'Please upload live photo and both sides of Aadhaar card.' });
   }
 
   if (!password) {
@@ -211,7 +211,8 @@ export const registerWorker = async (req, res) => {
   }
 
   const livePhoto = req.files.livePhoto[0].filename;
-  const aadhaarCard = req.files.aadhaarCard[0].filename; // New
+  const aadhaarFront = req.files.aadhaarFront[0].filename;
+  const aadhaarBack = req.files.aadhaarBack[0].filename;
   const panCard = req.files.panCard ? req.files.panCard[0].filename : null; // Optional
 
   try {
@@ -258,7 +259,8 @@ export const registerWorker = async (req, res) => {
       longitude: parsedLng,
       livePhoto,
       aadhaarNumber,
-      aadhaarCard,
+      aadhaarFront,
+      aadhaarBack,
       panNumber,
       panCard,
       categories,
@@ -718,8 +720,11 @@ export const updateWorkerDetails = async (req, res) => {
       if (req.files && req.files.livePhoto) {
         worker.livePhoto = req.files.livePhoto[0].filename;
       }
-      if (req.files && req.files.aadhaarCard) { // New
-        worker.aadhaarCard = req.files.aadhaarCard[0].filename;
+      if (req.files && req.files.aadhaarFront) {
+        worker.aadhaarFront = req.files.aadhaarFront[0].filename;
+      }
+      if (req.files && req.files.aadhaarBack) {
+        worker.aadhaarBack = req.files.aadhaarBack[0].filename;
       }
       if (req.files && req.files.panCard) { // New
         worker.panCard = req.files.panCard[0].filename;

@@ -167,6 +167,99 @@ export default function WorkerProfilePage() {
                     </div>
                 </Card>
 
+                {/* Documents Section */}
+                <Card className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">Verification Documents</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {/* Live Photo */}
+                        <div className="border rounded-lg p-2">
+                            <p className="text-sm font-semibold mb-2">Upload Photo (Selfie)</p>
+                            {worker.livePhoto ? (
+                                <div className="relative h-48 cursor-pointer" onClick={() => window.open(`${SERVER_URL}/uploads/${worker.livePhoto}`, '_blank')}>
+                                    <img
+                                        src={`${SERVER_URL}/uploads/${worker.livePhoto}`}
+                                        alt="Live Photo"
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-1 rounded">Click to View</div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded text-gray-400">
+                                    Not Uploaded
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Aadhaar Front */}
+                        <div className="border rounded-lg p-2">
+                            <p className="text-sm font-semibold mb-2">Aadhaar Front</p>
+                            {worker.aadhaarFront ? (
+                                <div className="relative h-48 cursor-pointer" onClick={() => window.open(`${SERVER_URL}/uploads/${worker.aadhaarFront}`, '_blank')}>
+                                    <img
+                                        src={`${SERVER_URL}/uploads/${worker.aadhaarFront}`}
+                                        alt="Aadhaar Front"
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-1 rounded">Click to View</div>
+                                </div>
+                            ) : worker.aadhaarCard ? (
+                                // Fallback for legacy
+                                <div className="relative h-48 cursor-pointer" onClick={() => window.open(`${SERVER_URL}/uploads/${worker.aadhaarCard}`, '_blank')}>
+                                    <img
+                                        src={`${SERVER_URL}/uploads/${worker.aadhaarCard}`}
+                                        alt="Aadhaar Card (Legacy)"
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                    <div className="absolute top-0 right-0 bg-yellow-400 text-xs px-1 rounded-bl">Legacy</div>
+                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-1 rounded">Click to View</div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded text-gray-400">
+                                    Not Uploaded
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Aadhaar Back */}
+                        <div className="border rounded-lg p-2">
+                            <p className="text-sm font-semibold mb-2">Aadhaar Back</p>
+                            {worker.aadhaarBack ? (
+                                <div className="relative h-48 cursor-pointer" onClick={() => window.open(`${SERVER_URL}/uploads/${worker.aadhaarBack}`, '_blank')}>
+                                    <img
+                                        src={`${SERVER_URL}/uploads/${worker.aadhaarBack}`}
+                                        alt="Aadhaar Back"
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-1 rounded">Click to View</div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded text-gray-400">
+                                    {worker.aadhaarCard ? "N/A (Legacy)" : "Not Uploaded"}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* PAN Card */}
+                        <div className="border rounded-lg p-2">
+                            <p className="text-sm font-semibold mb-2">PAN Card</p>
+                            {worker.panCard ? (
+                                <div className="relative h-48 cursor-pointer" onClick={() => window.open(`${SERVER_URL}/uploads/${worker.panCard}`, '_blank')}>
+                                    <img
+                                        src={`${SERVER_URL}/uploads/${worker.panCard}`}
+                                        alt="PAN Card"
+                                        className="w-full h-full object-cover rounded"
+                                    />
+                                    <div className="absolute bottom-0 right-0 bg-black bg-opacity-50 text-white text-xs px-2 py-1 m-1 rounded">Click to View</div>
+                                </div>
+                            ) : (
+                                <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded text-gray-400">
+                                    Not Uploaded
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </Card>
+
                 {/* About Section */}
                 <Card className="mb-6">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">About</h2>

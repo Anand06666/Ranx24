@@ -44,7 +44,8 @@ const upload = multer({
 // Middleware to handle multiple file uploads
 const uploadMiddleware = upload.fields([
   { name: 'livePhoto', maxCount: 1 },
-  { name: 'aadhaarCard', maxCount: 1 },
+  { name: 'aadhaarFront', maxCount: 1 },
+  { name: 'aadhaarBack', maxCount: 1 },
   { name: 'panCard', maxCount: 1 },
   { name: 'categoryImage', maxCount: 1 }, // Added for category images
   { name: 'image', maxCount: 1 }, // Added for service images

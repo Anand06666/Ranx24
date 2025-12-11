@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 export default function VerificationStep({ formData, updateFormData, handleNext, handlePrev }) {
   const [livePhotoFile, setLivePhotoFile] = useState(formData.livePhoto);
   const [aadhaarNumber, setAadhaarNumber] = useState(formData.aadhaarNumber || '');
-  const [aadhaarCardFile, setAadhaarCardFile] = useState(formData.aadhaarCard);
+  const [aadhaarFrontFile, setAadhaarFrontFile] = useState(formData.aadhaarFront);
+  const [aadhaarBackFile, setAadhaarBackFile] = useState(formData.aadhaarBack);
   const [panNumber, setPanNumber] = useState(formData.panNumber || '');
   const [panCardFile, setPanCardFile] = useState(formData.panCard);
   const [errors, setErrors] = useState({});
@@ -16,8 +17,11 @@ export default function VerificationStep({ formData, updateFormData, handleNext,
     if (!aadhaarNumber) {
       newErrors.aadhaarNumber = 'Aadhaar number is required.';
     }
-    if (!aadhaarCardFile) {
-      newErrors.aadhaarCard = 'Aadhaar card is required.';
+    if (!aadhaarFrontFile) {
+      newErrors.aadhaarFront = 'Aadhaar front photo is required.';
+    }
+    if (!aadhaarBackFile) {
+      newErrors.aadhaarBack = 'Aadhaar back photo is required.';
     }
     // PAN card and number are optional, so no validation here
     setErrors(newErrors);
@@ -28,7 +32,8 @@ export default function VerificationStep({ formData, updateFormData, handleNext,
     if (validate()) {
       updateFormData({
         aadhaarNumber,
-        aadhaarCard: aadhaarCardFile,
+        aadhaarFront: aadhaarFrontFile,
+        aadhaarBack: aadhaarBackFile,
         panNumber,
         panCard: panCardFile,
       });
@@ -49,11 +54,18 @@ export default function VerificationStep({ formData, updateFormData, handleNext,
     setErrors(prev => ({ ...prev, aadhaarNumber: '' }));
   };
 
-  const handleAadhaarCardChange = (e) => {
+  const handleAadhaarFrontChange = (e) => {
     const file = e.target.files[0];
-    setAadhaarCardFile(file);
-    updateFormData({ aadhaarCard: file });
-    setErrors(prev => ({ ...prev, aadhaarCard: '' }));
+    setAadhaarFrontFile(file);
+    updateFormData({ aadhaarFront: file });
+    setErrors(prev => ({ ...prev, aadhaarFront: '' }));
+  };
+
+  const handleAadhaarBackChange = (e) => {
+    const file = e.target.files[0];
+    setAadhaarBackFile(file);
+    updateFormData({ aadhaarBack: file });
+    setErrors(prev => ({ ...prev, aadhaarBack: '' }));
   };
 
   const handlePanNumberChange = (e) => {
@@ -70,8 +82,8 @@ export default function VerificationStep({ formData, updateFormData, handleNext,
   return (
     <div className="p-4 border rounded-lg">
       <h3 className="text-lg font-medium leading-6 text-gray-900">Step 3: Verification</h3>
-      
-      
+
+
       <div className="mt-4">
         <label htmlFor="livePhoto" className="block text-sm font-medium text-gray-700">Upload Photo</label>
         <p className="mt-1 text-sm text-gray-600">Please upload a clear, recent photo of yourself.</p>
@@ -100,16 +112,29 @@ export default function VerificationStep({ formData, updateFormData, handleNext,
       </div>
 
       <div className="mt-6">
-        <label htmlFor="aadhaarCard" className="block text-sm font-medium text-gray-700">Upload Aadhaar Card (Front & Back)</label>
+        <label htmlFor="aadhaarFront" className="block text-sm font-medium text-gray-700">Upload Aadhaar Card Front</label>
         <input
           type="file"
-          id="aadhaarCard"
-          onChange={handleAadhaarCardChange}
+          id="aadhaarFront"
+          onChange={handleAadhaarFrontChange}
           className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           accept="image/*,.pdf"
         />
-        {aadhaarCardFile && <p className="mt-2 text-sm text-gray-500">Selected: {aadhaarCardFile.name}</p>}
-        {errors.aadhaarCard && <p className="text-red-500 text-xs italic mt-1">{errors.aadhaarCard}</p>}
+        {aadhaarFrontFile && <p className="mt-2 text-sm text-gray-500">Selected: {aadhaarFrontFile.name}</p>}
+        {errors.aadhaarFront && <p className="text-red-500 text-xs italic mt-1">{errors.aadhaarFront}</p>}
+      </div>
+
+      <div className="mt-6">
+        <label htmlFor="aadhaarBack" className="block text-sm font-medium text-gray-700">Upload Aadhaar Card Back</label>
+        <input
+          type="file"
+          id="aadhaarBack"
+          onChange={handleAadhaarBackChange}
+          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          accept="image/*,.pdf"
+        />
+        {aadhaarBackFile && <p className="mt-2 text-sm text-gray-500">Selected: {aadhaarBackFile.name}</p>}
+        {errors.aadhaarBack && <p className="text-red-500 text-xs italic mt-1">{errors.aadhaarBack}</p>}
       </div>
 
       <div className="mt-6">

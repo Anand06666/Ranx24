@@ -14,7 +14,7 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const MapScreen = ({ navigation }: any) => {
     const { colors, isDark } = useTheme();
-    const { setLocation } = useLocation();
+    const { setManualLocation } = useLocation();
     const mapRef = useRef<MapView>(null);
 
     const [region, setRegion] = useState<Region | null>(null);
@@ -95,12 +95,11 @@ const MapScreen = ({ navigation }: any) => {
             if (result.length > 0) {
                 const item = result[0];
                 // Update global location context
-                setLocation({
+                setManualLocation({
                     latitude: selectedLocation.latitude,
                     longitude: selectedLocation.longitude,
                     city: item.city || item.subregion || '',
                     state: item.region || '',
-                    loading: false
                 });
 
                 navigation.goBack();

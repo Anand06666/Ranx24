@@ -56,7 +56,8 @@ const RegisterScreen = ({ navigation }: any) => {
 
     const [images, setImages] = useState<{
         livePhoto?: string;
-        aadhaarCard?: string;
+        aadhaarFront?: string;
+        aadhaarBack?: string;
         panCard?: string;
     }>({});
 
@@ -64,7 +65,7 @@ const RegisterScreen = ({ navigation }: any) => {
         setFormData({ ...formData, [field]: value });
     };
 
-    const pickImage = async (type: 'livePhoto' | 'aadhaarCard' | 'panCard') => {
+    const pickImage = async (type: 'livePhoto' | 'aadhaarFront' | 'aadhaarBack' | 'panCard') => {
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -102,8 +103,8 @@ const RegisterScreen = ({ navigation }: any) => {
     };
 
     const validateStep3 = () => {
-        if (!formData.aadhaarNumber || !images.aadhaarCard || !images.livePhoto) {
-            Alert.alert('Missing Documents', 'Please provide Aadhaar number, Aadhaar card photo, and your live photo');
+        if (!formData.aadhaarNumber || !images.aadhaarFront || !images.aadhaarBack || !images.livePhoto) {
+            Alert.alert('Missing Documents', 'Please provide Aadhaar number, both sides of Aadhaar card, and your live photo');
             return false;
         }
         if (formData.aadhaarNumber.length !== 12) {
@@ -161,16 +162,24 @@ const RegisterScreen = ({ navigation }: any) => {
                 console.log('WARNING: No livePhoto in images state!');
             }
 
-            if (images.aadhaarCard) {
-                console.log('Appending aadhaarCard:', images.aadhaarCard);
-                const aadhaarFile = {
-                    uri: images.aadhaarCard,
+            if (images.aadhaarFront) {
+                console.log('Appending aadhaarFront:', images.aadhaarFront);
+                const aadhaarFrontFile = {
+                    uri: images.aadhaarFront,
                     type: 'image/jpeg',
-                    name: 'aadhaar.jpg',
+                    name: 'aadhaar_front.jpg',
                 };
-                uploadData.append('aadhaarCard', aadhaarFile as any);
-            } else {
-                console.log('WARNING: No aadhaarCard in images state!');
+                uploadData.append('aadhaarFront', aadhaarFrontFile as any);
+            }
+
+            if (images.aadhaarBack) {
+                console.log('Appending aadhaarBack:', images.aadhaarBack);
+                const aadhaarBackFile = {
+                    uri: images.aadhaarBack,
+                    type: 'image/jpeg',
+                    name: 'aadhaar_back.jpg',
+                };
+                uploadData.append('aadhaarBack', aadhaarBackFile as any);
             }
 
             if (images.panCard) {
@@ -403,14 +412,26 @@ const RegisterScreen = ({ navigation }: any) => {
                 />
             </View>
 
-            <Text style={styles.label}>Upload Aadhaar Card *</Text>
-            <TouchableOpacity style={styles.uploadBox} onPress={() => pickImage('aadhaarCard')}>
-                {images.aadhaarCard ? (
-                    <Image source={{ uri: images.aadhaarCard }} style={styles.uploadedImage} />
+            <Text style={styles.label}>Upload Aadhaar Card Front *</Text>
+            <TouchableOpacity style={styles.uploadBox} onPress={() => pickImage('aadhaarFront')}>
+                {images.aadhaarFront ? (
+                    <Image source={{ uri: images.aadhaarFront }} style={styles.uploadedImage} />
                 ) : (
                     <>
                         <Ionicons name="cloud-upload-outline" size={32} color={colors.primary} />
-                        <Text style={styles.uploadText}>Tap to upload Aadhaar Card</Text>
+                        <Text style={styles.uploadText}>Tap to upload Aadhaar Front</Text>
+                    </>
+                )}
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Upload Aadhaar Card Back *</Text>
+            <TouchableOpacity style={styles.uploadBox} onPress={() => pickImage('aadhaarBack')}>
+                {images.aadhaarBack ? (
+                    <Image source={{ uri: images.aadhaarBack }} style={styles.uploadedImage} />
+                ) : (
+                    <>
+                        <Ionicons name="cloud-upload-outline" size={32} color={colors.primary} />
+                        <Text style={styles.uploadText}>Tap to upload Aadhaar Back</Text>
                     </>
                 )}
             </TouchableOpacity>

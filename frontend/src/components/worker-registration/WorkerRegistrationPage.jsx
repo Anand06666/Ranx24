@@ -34,7 +34,8 @@ export default function WorkerRegistrationPage() {
     confirmPassword: "", // Added
     livePhoto: null,
     aadhaarNumber: "", // New
-    aadhaarCard: null, // New
+    aadhaarFront: null, // New
+    aadhaarBack: null, // New
     panNumber: "", // New
     panCard: null, // New
     categories: [],
@@ -77,9 +78,12 @@ export default function WorkerRegistrationPage() {
       data.append("livePhoto", formData.livePhoto);
     }
 
-    // aadhaar card (File object directly)
-    if (formData.aadhaarCard) {
-      data.append("aadhaarCard", formData.aadhaarCard);
+    // aadhaar card (File object directly) - Front & Back
+    if (formData.aadhaarFront) {
+      data.append("aadhaarFront", formData.aadhaarFront);
+    }
+    if (formData.aadhaarBack) {
+      data.append("aadhaarBack", formData.aadhaarBack);
     }
 
     // pan card (File object directly)

@@ -52,7 +52,11 @@ const workerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  aadhaarCard: { // New
+  aadhaarFront: { // New
+    type: String, // URL to the uploaded image
+    required: true,
+  },
+  aadhaarBack: { // New
     type: String, // URL to the uploaded image
     required: true,
   },
