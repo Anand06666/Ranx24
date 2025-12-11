@@ -460,14 +460,14 @@ const RegisterScreen = ({ navigation }: any) => {
                 )}
             </TouchableOpacity>
 
-            <Text style={styles.label}>Live Photo (Selfie) *</Text>
+            <Text style={styles.label}>Upload Photo *</Text>
             <TouchableOpacity style={styles.uploadBox} onPress={() => pickImage('livePhoto')}>
                 {images.livePhoto ? (
                     <Image source={{ uri: images.livePhoto }} style={styles.uploadedImage} />
                 ) : (
                     <>
                         <Ionicons name="camera-outline" size={32} color={colors.primary} />
-                        <Text style={styles.uploadText}>Tap to take/upload Selfie</Text>
+                        <Text style={styles.uploadText}>Tap to upload Photo</Text>
                     </>
                 )}
             </TouchableOpacity>
