@@ -39,7 +39,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
 const AdminRegisterPage = lazy(() => import("./pages/AdminRegisterPage"));
 const AdminLayout = lazy(() => import("./components/admin-panel/AdminLayout"));
-// const AdminPanel = lazy(() => import("./pages/AdminPanel")); // Deprecated
+
 
 // Worker Auth Pages
 const WorkerLoginPage = lazy(() => import("./components/worker-registration/WorkerLoginPage"));
