@@ -34,6 +34,8 @@ export default function Footer() {
                             <li><FooterLink to="/categories">Our Services</FooterLink></li>
                             <li><FooterLink to="/contact">Contact Us</FooterLink></li>
                             <li><FooterLink to="/privacy">Privacy Policy</FooterLink></li>
+                            <li><FooterLink to="/terms">Terms and Conditions</FooterLink></li>
+                            <li><FooterLink to="/faq">FAQ</FooterLink></li>
                         </ul>
                     </div>
 
@@ -72,6 +74,7 @@ export default function Footer() {
                     <div className="flex gap-6">
                         <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
                         <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+                        <Link to="/faq" className="hover:text-white transition-colors">FAQ</Link>
                     </div>
                 </div>
             </div>
