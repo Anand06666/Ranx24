@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LucideFacebook, LucideTwitter, LucideInstagram, LucideLinkedin, LucideMail, LucidePhone, LucideMapPin } from 'lucide-react';
+import { LucideFacebook, LucideTwitter, LucideInstagram, LucideLinkedin, LucideMail, LucidePhone, LucideMapPin, LucideYoutube } from 'lucide-react';
 
 export default function Footer() {
     return (
@@ -18,9 +18,9 @@ export default function Footer() {
                             Your trusted partner for home services. We connect you with top-rated professionals for quality, reliability, and speed.
                         </p>
                         <div className="flex space-x-4 pt-2">
-                            <SocialLink href="#" icon={<LucideFacebook size={18} />} />
-                            <SocialLink href="#" icon={<LucideTwitter size={18} />} />
-                            <SocialLink href="#" icon={<LucideInstagram size={18} />} />
+                            <SocialLink href="https://www.facebook.com/profile.php?id=61584155575066" icon={<LucideFacebook size={18} />} />
+                            <SocialLink href="https://www.instagram.com/ranx24homeservice/" icon={<LucideInstagram size={18} />} />
+                            <SocialLink href="https://www.youtube.com/@RanX24" icon={<LucideYoutube size={18} />} />
                             <SocialLink href="#" icon={<LucideLinkedin size={18} />} />
                         </div>
                     </div>

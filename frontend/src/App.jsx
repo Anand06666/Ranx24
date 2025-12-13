@@ -34,6 +34,9 @@ const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
 
 // Admin Pages
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
@@ -132,6 +135,9 @@ export default function App() {
               </Route>
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/faq" element={<FAQPage />} />
             </Route>
 
             {/* ADMIN ROUTES */}

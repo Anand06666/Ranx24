@@ -13,6 +13,9 @@ import { BookingAlertProvider } from '../context/BookingAlertProvider';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import ForgotPasswordScreen from '../screens/auth/ForgotPasswordScreen';
+import PrivacyPolicyScreen from '../screens/auth/PrivacyPolicyScreen';
+import AboutScreen from '../screens/auth/AboutScreen';
+import TermsScreen from '../screens/auth/TermsScreen';
 
 // Worker Screens
 import DashboardScreen from '../screens/worker/DashboardScreen';
@@ -93,6 +96,9 @@ const AppNavigator: React.FC = () => {
                             <Stack.Screen name="Login" component={LoginScreen} />
                             <Stack.Screen name="Register" component={RegisterScreen} />
                             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+                            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+                            <Stack.Screen name="About" component={AboutScreen} />
+                            <Stack.Screen name="Terms" component={TermsScreen} />
                         </>
                     ) : (
                         // Worker Stack
@@ -108,6 +114,8 @@ const AppNavigator: React.FC = () => {
                             <Stack.Screen name="PendingBookings" component={PendingBookingsScreen} options={{ headerShown: false }} />
                             <Stack.Screen name="ActiveBookings" component={ActiveBookingsScreen} options={{ headerShown: false }} />
                             <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+                            <Stack.Screen name="About" component={AboutScreen} options={{ headerShown: false }} />
+                            <Stack.Screen name="Terms" component={TermsScreen} options={{ headerShown: false }} />
                         </>
                     )}
                 </Stack.Navigator>

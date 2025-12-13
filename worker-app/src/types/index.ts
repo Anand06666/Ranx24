@@ -89,6 +89,10 @@ export interface AuthContextType {
 export type RootStackParamList = {
     Login: undefined;
     Register: undefined;
+    ForgotPassword: undefined;
+    PrivacyPolicy: undefined;
+    About: undefined;
+    Terms: undefined;
     Dashboard: undefined;
     Profile: undefined;
     BookingDetails: { bookingId: string };

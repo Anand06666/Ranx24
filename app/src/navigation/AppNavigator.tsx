@@ -36,6 +36,10 @@ import ChatListScreen from '../screens/user/ChatListScreen';
 import MapScreen from '../screens/user/MapScreen';
 import CategoryDetailScreen from '../screens/user/CategoryDetailScreen';
 import SubCategoryScreen from '../screens/user/SubCategoryScreen';
+import PrivacyPolicyScreen from '../screens/user/PrivacyPolicyScreen';
+import AboutScreen from '../screens/user/AboutScreen';
+import TermsScreen from '../screens/user/TermsScreen';
+import FAQScreen from '../screens/user/FAQScreen';
 
 // Worker Screens
 import WorkerDashboardScreen from '../screens/worker/WorkerDashboardScreen';
@@ -153,7 +157,12 @@ const AppNavigator: React.FC = () => {
                         <Stack.Screen name="SupportChat" component={SupportChatScreen} />
                         <Stack.Screen name="WorkerProfile" component={WorkerProfileScreen} />
                         <Stack.Screen name="ChatList" component={ChatListScreen} />
+                        <Stack.Screen name="ChatList" component={ChatListScreen} />
                         <Stack.Screen name="Map" component={MapScreen} />
+                        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+                        <Stack.Screen name="About" component={AboutScreen} />
+                        <Stack.Screen name="Terms" component={TermsScreen} />
+                        <Stack.Screen name="FAQ" component={FAQScreen} />
                     </>
                 )}
             </Stack.Navigator>
