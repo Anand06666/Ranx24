@@ -157,7 +157,7 @@ const AppNavigator: React.FC = () => {
                         <Stack.Screen name="SupportChat" component={SupportChatScreen} />
                         <Stack.Screen name="WorkerProfile" component={WorkerProfileScreen} />
                         <Stack.Screen name="ChatList" component={ChatListScreen} />
-                        <Stack.Screen name="ChatList" component={ChatListScreen} />
+
                         <Stack.Screen name="Map" component={MapScreen} />
                         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
                         <Stack.Screen name="About" component={AboutScreen} />

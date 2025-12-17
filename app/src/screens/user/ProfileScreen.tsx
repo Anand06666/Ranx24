@@ -29,6 +29,7 @@ const ProfileScreen = ({ navigation }: any) => {
         { icon: 'calendar-outline', label: 'My Bookings', screen: 'MyBookings', color: '#8B5CF6' },
         { icon: 'notifications-outline', label: 'Notifications', screen: 'Notifications', color: '#F59E0B' },
         { icon: 'help-circle-outline', label: 'Help & Support', screen: 'Help', color: '#6B7280' },
+        { icon: 'information-circle-outline', label: 'About Us', screen: 'About', color: '#6366F1' },
         { icon: 'settings-outline', label: 'Settings', screen: 'Settings', color: '#4B5563' },
     ];
 

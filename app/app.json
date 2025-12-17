@@ -46,8 +46,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "00000000-0000-0000-0000-000000000000"
+        "projectId": "15b03946-baca-4b57-8d5f-27bac2eedcbc"
       }
-    }
+    },
+    "owner": "babbukallu"
   }
 }

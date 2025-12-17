@@ -84,7 +84,7 @@ const LoginScreen: React.FC = () => {
 
           <View style={styles.header}>
             <Image
-              source={require('../../../assets/icon.png')}
+              source={require('../../../assets/logo.png')}
               style={styles.logoImage}
               resizeMode="contain"
             />

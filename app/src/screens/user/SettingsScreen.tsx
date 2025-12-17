@@ -141,21 +141,25 @@ const SettingsScreen = ({ navigation }: any) => {
                     />
                 </View>
 
-                {/* Legal Section */}
                 <View style={styles.section}>
                     <SectionTitle title="Legal" />
                     <SettingItem
                         icon="document-text-outline"
                         label="Terms & Conditions"
-                        onPress={() => openModal('Terms & Conditions', TERMS_CONTENT)}
+                        onPress={() => navigation.navigate('Terms')}
                     />
                     <SettingItem
                         icon="shield-checkmark-outline"
                         label="Privacy Policy"
-                        onPress={() => openModal('Privacy Policy', PRIVACY_CONTENT)}
+                        onPress={() => navigation.navigate('PrivacyPolicy')}
                     />
                     <SettingItem
                         icon="help-circle-outline"
+                        label="FAQ"
+                        onPress={() => navigation.navigate('FAQ')}
+                    />
+                    <SettingItem
+                        icon="chatbubble-ellipses-outline"
                         label="Help & Support"
                         onPress={() => navigation.navigate('SupportChat')}
                     />
@@ -183,67 +187,12 @@ const SettingsScreen = ({ navigation }: any) => {
                 </View>
             </ScrollView>
 
-            {/* Modal for Legal Content */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={!!modalVisible}
-                onRequestClose={closeModal}
-            >
-                <View style={[styles.modalContainer, { backgroundColor: isDark ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)' }]}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                        <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
-                            <Text style={[styles.modalTitle, { color: colors.text }]}>{modalVisible?.title}</Text>
-                            <TouchableOpacity onPress={closeModal}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
-                        <ScrollView style={styles.modalBody}>
-                            <Text style={[styles.modalText, { color: colors.textSecondary }]}>
-                                {modalVisible?.content}
-                            </Text>
-                        </ScrollView>
-                    </View>
-                </View>
-            </Modal>
+
         </SafeAreaView>
     );
 };
 
-const TERMS_CONTENT = `
-1. Introduction
-Welcome to Yellow Caps. By using our app, you agree to these terms.
 
-2. Services
-We provide a platform to connect users with service workers.
-
-3. User Responsibilities
-You agree to provide accurate information and treat workers with respect.
-
-4. Payments
-Payments are processed securely. You agree to pay for services rendered.
-
-5. Liability
-We are not liable for damages arising from the use of our services.
-
-(This is a simplified placeholder. Real terms should be comprehensive.)
-`;
-
-const PRIVACY_CONTENT = `
-1. Data Collection
-We collect your name, email, phone number, and location to provide services.
-
-2. Data Usage
-We use your data to match you with workers and improve our app.
-
-3. Data Sharing
-We share your location and contact info with the assigned worker only.
-
-4. Security
-We take reasonable measures to protect your data.
-
-(This is a simplified placeholder. Real privacy policy should be comprehensive.)
-`;
 
 const styles = StyleSheet.create({
     container: {
