@@ -1,6 +1,9 @@
 
 # Common
+node_modules
+/node_modules
 node_modules/
+**/node_modules
 .expo/
 npm-debug.*
 yarn-debug.*
