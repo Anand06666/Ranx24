@@ -1,0 +1,22 @@
+
+# Common
+node_modules/
+.expo/
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Android
+android/build/
+android/app/build/
+android/.gradle/
+android/.cxx/
+android/.idea/
+*.keystore
+*.jks
+
+# iOS
+ios/build/
+ios/Pods/
+*.xcworkspace
+*.xcuserdatad
