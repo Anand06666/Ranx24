@@ -38,6 +38,7 @@ const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/TermsPage"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const HomeTips = lazy(() => import("./pages/HomeTips"));
+const HomeTipDetail = lazy(() => import("./pages/HomeTipDetail"));
 
 // Admin Pages
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
@@ -143,6 +144,7 @@ export default function App() {
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/faq" element={<FAQPage />} />
               <Route path="/home-tips" element={<HomeTips />} />
+              <Route path="/home-tips/:id" element={<HomeTipDetail />} />
             </Route>
 
             {/* ADMIN ROUTES */}

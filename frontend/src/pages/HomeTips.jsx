@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import { LucideCalendar, LucideUser, LucideArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://www.ranx24.com';
 
@@ -65,9 +66,9 @@ const HomeTips = () => {
 
                                     {/* Read More Button (Optional - currently opens updated view or just visually indicates content) */}
                                     <div className="mt-auto pt-4 border-t border-gray-50">
-                                        <span className="text-blue-600 font-semibold text-sm flex items-center group cursor-pointer hover:underline">
+                                        <Link to={`/home-tips/${tip._id}`} className="text-blue-600 font-semibold text-sm flex items-center group cursor-pointer hover:underline">
                                             Read More <LucideArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-                                        </span>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
