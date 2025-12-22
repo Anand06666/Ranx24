@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { useLocation } from '../context/LocationContext';
-import { LucideSearch, LucideMapPin, LucideShieldCheck, LucideClock, LucideStar, LucideArrowRight, LucideX, LucideChevronDown, LucideDownload } from 'lucide-react';
+import { LucideSearch, LucideMapPin, LucideShieldCheck, LucideClock, LucideStar, LucideArrowRight, LucideX, LucideChevronDown, LucideDownload, LucidePlay, LucideQuote } from 'lucide-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'https://www.ranx24.com';
 
@@ -12,6 +12,8 @@ const UserPage = () => {
   const [loading, setLoading] = useState(true);
   const { location, detectLocation, updateCity } = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [testimonials, setTestimonials] = useState([]);
+  const [activeVideo, setActiveVideo] = useState(null);
 
   // Manual Location State
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -27,6 +29,14 @@ const UserPage = () => {
           setBanners(bannersRes.data);
         } catch (bannerErr) {
           console.log('Banner fetch error:', bannerErr);
+        }
+
+        // Fetch Testimonials
+        try {
+          const testRes = await axiosInstance.get('/testimonials');
+          setTestimonials(testRes.data);
+        } catch (testErr) {
+          console.log('Testimonials fetch error:', testErr);
         }
 
         let url = '/categories';
@@ -312,6 +322,87 @@ const UserPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      {testimonials.length > 0 && (
+        <section className="py-20 bg-gray-50 border-t border-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Clients Say</h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">Real stories from satisfied customers who trusted RanX24.</p>
+            </div>
+
+            <div className="flex overflow-x-auto gap-6 pb-8 scrollbar-hide snap-x px-4">
+              {testimonials.map((item) => {
+                const getYouTubeId = (url) => {
+                  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+                  const match = url.match(regExp);
+                  return (match && match[2].length === 11) ? match[2] : null;
+                };
+                const videoId = getYouTubeId(item.videoUrl);
+                const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : null;
+
+                return (
+                  <div key={item._id} className="min-w-[300px] md:min-w-[400px] bg-white rounded-2xl p-6 shadow-sm border border-gray-100 snap-center flex flex-col">
+                    {/* Video Thumbnail / Player */}
+                    <div className="w-full h-56 rounded-xl overflow-hidden bg-black relative group mb-6 flex-shrink-0">
+                      {activeVideo === item._id && videoId ? (
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                          title={item.clientName}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
+                      ) : (
+                        <>
+                          {thumbnailUrl ? (
+                            <img src={thumbnailUrl} alt={item.clientName} className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">
+                              <LucidePlay size={40} />
+                            </div>
+                          )}
+                          <button
+                            onClick={() => setActiveVideo(item._id)}
+                            className="absolute inset-0 flex items-center justify-center"
+                          >
+                            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center pl-1 shadow-lg">
+                                <LucidePlay size={24} className="text-blue-600 fill-current" />
+                              </div>
+                            </div>
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex text-yellow-400 mb-3">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <LucideStar key={i} size={16} className={`${i < item.rating ? 'fill-current' : 'text-gray-200'}`} />
+                        ))}
+                      </div>
+
+                      <div className="relative">
+                        <LucideQuote size={40} className="absolute -top-2 -left-2 text-blue-100 -z-10" />
+                        <p className="text-gray-600 italic mb-6 relative z-10">"{item.comment}"</p>
+                      </div>
+
+                      <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
+                        <h4 className="font-bold text-gray-900">{item.clientName}</h4>
+                        <span className="text-xs text-gray-400">{new Date(item.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-blue-600 text-white text-center">

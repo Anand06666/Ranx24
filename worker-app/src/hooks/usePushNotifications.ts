@@ -80,6 +80,12 @@ export const usePushNotifications = () => {
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
             console.log('Notification tapped:', response);
+
+            if (!isAuthenticated) {
+                console.log('User not authenticated, ignoring notification navigation');
+                return;
+            }
+
             const data = response.notification.request.content.data;
 
             if (data?.screen && navigationRef.isReady()) {

@@ -37,6 +37,7 @@ const ContactPage = lazy(() => import("./pages/ContactPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
 const TermsPage = lazy(() => import("./pages/TermsPage"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
+const HomeTips = lazy(() => import("./pages/HomeTips"));
 
 // Admin Pages
 const AdminLoginPage = lazy(() => import("./pages/AdminLoginPage"));
@@ -86,6 +87,9 @@ import UserPushNotifications from "./components/admin-panel/UserPushNotification
 import WorkerPushNotifications from "./components/admin-panel/WorkerPushNotifications";
 import EmployeeManagement from "./components/admin-panel/EmployeeManagement";
 import PayoutHistory from "./components/admin-panel/PayoutHistory";
+const PayoutHistory = lazy(() => import("./components/admin-panel/PayoutHistory"));
+import HomeTipsManagement from "./components/admin-panel/HomeTipsManagement";
+import TestimonialsManagement from "./components/admin-panel/TestimonialsManagement";
 const AdminChangePassword = lazy(() => import("./pages/AdminChangePassword"));
 
 import UserLayout from "./components/UserLayout";
@@ -138,6 +142,7 @@ export default function App() {
               <Route path="/privacy" element={<PrivacyPolicyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/faq" element={<FAQPage />} />
+              <Route path="/home-tips" element={<HomeTips />} />
             </Route>
 
             {/* ADMIN ROUTES */}
@@ -159,6 +164,8 @@ export default function App() {
                 <Route path="coins" element={<CoinsManagement />} />
                 <Route path="fees" element={<FeeManagement />} />
                 <Route path="finance" element={<FinanceManagement />} />
+                <Route path="home-tips" element={<HomeTipsManagement />} />
+                <Route path="testimonials" element={<TestimonialsManagement />} />
                 <Route path="withdrawals" element={<WithdrawalManagement />} />
                 <Route path="payout-history" element={<PayoutHistory />} />
                 <Route path="help" element={<HelpManagement />} />

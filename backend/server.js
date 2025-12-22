@@ -155,6 +155,8 @@ import workerWalletRoutes from "./router/workerWalletRoutes.js";
 import serviceRoutes from "./router/serviceRoutes.js";
 import locationRoutes from "./router/locationRoutes.js";
 import paymentConfigRoutes from "./router/paymentConfigRoutes.js";
+import homeTipRoutes from "./router/homeTipRoutes.js";
+import testimonialRoutes from "./router/testimonialRoutes.js";
 
 // Use Routes
 app.use("/api/admin", adminRoutes);
@@ -183,6 +185,8 @@ app.use("/api/availability", availabilityRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/location", locationRoutes);
+app.use("/api/home-tips", homeTipRoutes);
+app.use("/api/testimonials", testimonialRoutes);
 
 // Health Check Endpoint
 app.get("/health", (req, res) => {

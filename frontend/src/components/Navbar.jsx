@@ -34,6 +34,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Services', path: '/categories' },
+    { name: 'Home Tips', path: '/home-tips' },
     { name: 'About Us', path: '/about' }, // Placeholder
     { name: 'Contact', path: '/contact' }, // Placeholder
   ];

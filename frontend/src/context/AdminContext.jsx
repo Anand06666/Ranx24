@@ -30,6 +30,9 @@ export const AdminProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const [homeTips, setHomeTips] = useState([]);
+    const [testimonials, setTestimonials] = useState([]);
+
     const getAuthHeader = () => {
         const token = localStorage.getItem('token');
         return { headers: { Authorization: `Bearer ${token}` } };
@@ -47,9 +50,11 @@ export const AdminProvider = ({ children }) => {
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            const [catRes, cityRes] = await Promise.all([
+            const [catRes, cityRes, tipsRes, testRes] = await Promise.all([
                 axios.get(`${API_URL}/categories`, getAuthHeader()),
                 axios.get(`${API_URL}/cities`, getAuthHeader()),
+                axios.get(`${API_URL}/home-tips/admin`, getAuthHeader()),
+                axios.get(`${API_URL}/testimonials/admin`, getAuthHeader()),
             ]);
 
             setCategories(catRes.data);
@@ -58,6 +63,8 @@ export const AdminProvider = ({ children }) => {
             );
             setSubCategories(allSubCategories);
             setCities(cityRes.data);
+            setHomeTips(tipsRes.data);
+            setTestimonials(testRes.data);
 
             setStats(prev => ({
                 ...prev,
@@ -206,6 +213,85 @@ export const AdminProvider = ({ children }) => {
         }
     };
 
+    // Home Tip Actions
+    const addHomeTip = async (formData) => {
+        try {
+            await axios.post(`${API_URL}/home-tips`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Home Tip added successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to add home tip");
+            return false;
+        }
+    };
+
+    const updateHomeTip = async (id, formData) => {
+        try {
+            await axios.put(`${API_URL}/home-tips/${id}`, formData, {
+                headers: { ...getAuthHeader().headers, 'Content-Type': 'multipart/form-data' }
+            });
+            await fetchInitialData();
+            toast.success("Home Tip updated successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to update home tip");
+            return false;
+        }
+    };
+
+    const deleteHomeTip = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await axios.delete(`${API_URL}/home-tips/${id}`, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Home Tip deleted successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to delete home tip");
+            return false;
+        }
+    };
+
+    // Testimonial Actions
+    const addTestimonial = async (data) => {
+        try {
+            await axios.post(`${API_URL}/testimonials`, data, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Testimonial added successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to add testimonial");
+            return false;
+        }
+    };
+
+    const updateTestimonial = async (id, data) => {
+        try {
+            await axios.put(`${API_URL}/testimonials/${id}`, data, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Testimonial updated successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to update testimonial");
+            return false;
+        }
+    };
+
+    const deleteTestimonial = async (id) => {
+        if (!window.confirm("Are you sure?")) return;
+        try {
+            await axios.delete(`${API_URL}/testimonials/${id}`, getAuthHeader());
+            await fetchInitialData();
+            toast.success("Testimonial deleted successfully");
+            return true;
+        } catch (err) {
+            toast.error("Failed to delete testimonial");
+            return false;
+        }
+    };
 
 
     const value = {
@@ -213,6 +299,8 @@ export const AdminProvider = ({ children }) => {
         categories,
         subCategories,
         cities,
+        homeTips,
+        testimonials,
         loading,
         error,
         fetchStats,
@@ -225,7 +313,13 @@ export const AdminProvider = ({ children }) => {
         deleteSubCategory,
         addService,
         updateService,
-        deleteService
+        deleteService,
+        addHomeTip,
+        updateHomeTip,
+        deleteHomeTip,
+        addTestimonial,
+        updateTestimonial,
+        deleteTestimonial
     };
 
     return (

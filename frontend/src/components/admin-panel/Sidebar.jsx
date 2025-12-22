@@ -119,6 +119,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <NavItem to="/admin-dashboard/coins" label="Coins Config" icon={Coins} />
               <NavItem to="/admin-dashboard/fees" label="Fees Config" icon={CreditCard} />
 
+              <SectionLabel label="Content Management" />
+              <NavItem to="/admin-dashboard/home-tips" label="Home Tips" icon={Megaphone} />
+              <NavItem to="/admin-dashboard/testimonials" label="Testimonials" icon={Megaphone} />
+
               <SectionLabel label="Staff" />
               <NavItem to="/admin-dashboard/employees" label="Employees" icon={Users} />
             </>
