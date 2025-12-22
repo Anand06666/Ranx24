@@ -86,8 +86,8 @@ import HelpManagement from "./components/admin-panel/HelpManagement";
 import UserPushNotifications from "./components/admin-panel/UserPushNotifications";
 import WorkerPushNotifications from "./components/admin-panel/WorkerPushNotifications";
 import EmployeeManagement from "./components/admin-panel/EmployeeManagement";
-import PayoutHistory from "./components/admin-panel/PayoutHistory";
 const PayoutHistory = lazy(() => import("./components/admin-panel/PayoutHistory"));
+
 import HomeTipsManagement from "./components/admin-panel/HomeTipsManagement";
 import TestimonialsManagement from "./components/admin-panel/TestimonialsManagement";
 const AdminChangePassword = lazy(() => import("./pages/AdminChangePassword"));
