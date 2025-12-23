@@ -172,8 +172,8 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/auth", authLimiter, authRoutes); // Apply stricter rate limiting to auth
 app.use("/api/wallet", userwalletRoutes);
 app.use("/api/worker-wallet", workerWalletRoutes);
-app.use("/api/payment/config", paymentConfigRoutes); // Payment config endpoint
-app.use("/api/payment", paymentRoutes);
+app.use("/api/payment", paymentConfigRoutes); // Must be before paymentRoutes - /api/payment/config (public)
+app.use("/api/payment", paymentRoutes); // /api/payment/order, /api/payment/verify (protected)
 app.use("/api/support", supportRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/chats", chatRoutes);
