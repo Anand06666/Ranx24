@@ -27,8 +27,9 @@ const config = {
     RETRY_ATTEMPTS: 3
 };
 
-// Razorpay Key - fetch from backend for security
-export const RAZORPAY_KEY_ID = 'rzp_test_RMXAUXty6nvaXm'; // Fallback only
+// Razorpay Key - MUST be fetched from backend API
+// DO NOT hardcode production keys here for security
+export const RAZORPAY_KEY_ID = ''; // Will be fetched from /api/payment/config
 
 export default config;
 

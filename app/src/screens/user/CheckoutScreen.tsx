@@ -22,7 +22,7 @@ import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { SHADOWS } from '../../constants/theme';
-import { RAZORPAY_KEY_ID } from '../../config/config';
+import { getRazorpayKey } from '../../services/razorpayService';
 
 const CheckoutScreen = ({ navigation, route }: any) => {
     const { colors, isDark } = useTheme();
@@ -320,6 +320,9 @@ const CheckoutScreen = ({ navigation, route }: any) => {
 
     const handleOnlinePayment = async (bookingPayload: any, amount: number) => {
         try {
+            // Fetch Razorpay key from backend
+            const razorpayKey = await getRazorpayKey();
+
             const orderResponse = await api.post('/payment/order', { amount });
             const { id: order_id, currency, amount: razorpayAmount } = orderResponse.data;
 
@@ -327,7 +330,7 @@ const CheckoutScreen = ({ navigation, route }: any) => {
                 description: 'Service Booking',
                 image: 'https://cdn-icons-png.flaticon.com/512/12145/12145443.png',
                 currency: currency,
-                key: RAZORPAY_KEY_ID,
+                key: razorpayKey,
                 amount: razorpayAmount,
                 name: 'RanX24',
                 order_id: order_id,

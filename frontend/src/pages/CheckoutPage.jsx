@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-hot-toast';
-import axiosInstance from '../utils/axiosConfig';
+import axiosInstance, { getRazorpayConfig } from '../utils/axiosConfig';
 import {
   LucideMapPin,
   LucideTicket,
@@ -169,14 +169,17 @@ export default function CheckoutPage() {
           return;
         }
 
-        // Create Razorpay Order
+        // 1. Fetch Razorpay Key from backend
+        const razorpayKey = await getRazorpayConfig();
+
+        // 2. Create Razorpay Order
         const { data: orderData } = await axiosInstance.post(
           `/payment/order`,
           { amount: totalAmount }
         );
 
         const options = {
-          key: "rzp_test_RMXAUXty6nvaXm",
+          key: razorpayKey, // Dynamically fetched from backend
           amount: orderData.amount,
           currency: orderData.currency,
           name: "RanX24",

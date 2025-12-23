@@ -18,4 +18,15 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+// Razorpay configuration - fetch from backend for security
+export const getRazorpayConfig = async () => {
+    try {
+        const response = await axiosInstance.get('/payment/config');
+        return response.data.razorpayKeyId;
+    } catch (error) {
+        console.error('Failed to fetch Razorpay config:', error);
+        throw new Error('Unable to initialize payment gateway');
+    }
+};
+
 export default axiosInstance;

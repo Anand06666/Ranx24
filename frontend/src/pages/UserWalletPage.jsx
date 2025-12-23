@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../utils/axiosConfig';
+import axiosInstance, { getRazorpayConfig } from '../utils/axiosConfig';
 import { toast } from 'react-hot-toast';
 import { FaWallet, FaCoins, FaHistory, FaArrowUp, FaArrowDown, FaExclamationCircle, FaPlus, FaTimes } from 'react-icons/fa';
 import Card from '../components/ui/Card';
@@ -42,11 +42,14 @@ const UserWalletPage = () => {
 
     setProcessing(true);
     try {
-      // 1. Create Order
+      // 1. Fetch Razorpay Key from backend
+      const razorpayKey = await getRazorpayConfig();
+
+      // 2. Create Order
       const { data: orderData } = await axiosInstance.post('/payment/order', { amount });
 
       const options = {
-        key: "rzp_test_RMXAUXty6nvaXm", // Should ideally come from env or config
+        key: razorpayKey, // Dynamically fetched from backend
         amount: orderData.amount,
         currency: orderData.currency,
         name: "RanX24",

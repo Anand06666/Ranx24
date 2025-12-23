@@ -20,7 +20,7 @@ import api from '../../services/api';
 import { SPACING, SHADOWS, SIZES } from '../../constants/theme';
 import Toast from 'react-native-toast-message';
 import RazorpayCheckout from 'react-native-razorpay';
-import { RAZORPAY_KEY_ID } from '../../config/config';
+import { getRazorpayKey } from '../../services/razorpayService';
 import { useTheme } from '../../context/ThemeContext';
 import ReviewModal from '../../components/ReviewModal';
 import ReviewCard from '../../components/ReviewCard';
@@ -72,6 +72,9 @@ const BookingDetailScreen = ({ navigation, route }: any) => {
 
         setActionLoading(true);
         try {
+            // Fetch Razorpay key from backend
+            const razorpayKey = await getRazorpayKey();
+
             const amount = booking.finalPrice;
             const orderResponse = await api.post('/payment/order', { amount });
             const { id: order_id, currency, amount: razorpayAmount } = orderResponse.data;
@@ -80,7 +83,7 @@ const BookingDetailScreen = ({ navigation, route }: any) => {
                 description: `Payment for ${booking.service}`,
                 image: 'https://cdn-icons-png.flaticon.com/512/12145/12145443.png',
                 currency: currency,
-                key: RAZORPAY_KEY_ID,
+                key: razorpayKey,
                 amount: razorpayAmount,
                 name: 'RanX24',
                 order_id: order_id,

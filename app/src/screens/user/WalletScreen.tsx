@@ -14,7 +14,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import RazorpayCheckout from 'react-native-razorpay';
-import { RAZORPAY_KEY_ID } from '../../config/config';
+import { getRazorpayKey } from '../../services/razorpayService';
 import {
     Modal,
     TextInput,
@@ -112,7 +112,10 @@ const WalletScreen = ({ navigation }) => {
 
         setAddingMoney(true);
         try {
-            // 1. Create Order
+            // 1. Fetch Razorpay Key from backend
+            const razorpayKey = await getRazorpayKey();
+
+            // 2. Create Order
             const orderResponse = await api.post('/payment/order', { amount });
             const { id: order_id, currency, amount: razorpayAmount } = orderResponse.data;
 
@@ -120,7 +123,7 @@ const WalletScreen = ({ navigation }) => {
                 description: 'Wallet Top-up',
                 image: 'https://cdn-icons-png.flaticon.com/512/12145/12145443.png', // App Logo
                 currency: currency,
-                key: RAZORPAY_KEY_ID,
+                key: razorpayKey, // Use dynamically fetched key
                 amount: razorpayAmount,
                 name: 'RanX24',
                 order_id: order_id,
@@ -128,9 +131,9 @@ const WalletScreen = ({ navigation }) => {
                 theme: { color: colors.primary }
             };
 
-            // 2. Open Razorpay
+            // 3. Open Razorpay
             RazorpayCheckout.open(options).then(async (data) => {
-                // 3. Verify Payment
+                // 4. Verify Payment
                 try {
                     const verifyResponse = await api.post('/payment/verify', {
                         razorpay_order_id: data.razorpay_order_id,
@@ -159,7 +162,8 @@ const WalletScreen = ({ navigation }) => {
 
         } catch (error) {
             console.error('Add Money Error:', error);
-            Toast.show({ type: 'error', text1: 'Error', text2: 'Failed to initiate payment' });
+            const errorMessage = error.message || 'Failed to initiate payment';
+            Toast.show({ type: 'error', text1: 'Error', text2: errorMessage });
         } finally {
             setAddingMoney(false);
         }
