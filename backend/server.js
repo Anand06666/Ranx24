@@ -127,6 +127,8 @@ app.use(customSanitize);
 
 // Static folder to serve Worker uploaded photos/profiles
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Serve public folder for .well-known/assetlinks.json
+app.use(express.static(path.join(__dirname, "public")));
 
 // Routes Imports
 import adminWorkerRoutes from "./router/adminWorkerRoutes.js";
