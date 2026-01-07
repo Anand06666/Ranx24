@@ -249,13 +249,10 @@ export const createBooking = async (req, res) => {
       bookingTime,
       address,
       price, // Original price
-      totalPrice: price, // Total before discounts
+      totalPrice: totalPrice, // Total BEFORE discount (variable totalPrice calculated above)
       couponApplied: couponId,
       couponCode: actualCouponCode,
       couponDiscount,
-      coinsUsed: coinsUsed || 0,
-      coinDiscount,
-      finalPrice,
       coinsUsed: coinsUsed || 0,
       coinDiscount,
       walletAmountUsed: walletDeducted,
@@ -269,9 +266,9 @@ export const createBooking = async (req, res) => {
       endDate,
       status: 'pending',
       // New Fee Fields
-      platformFee: { type: Number, default: 0 },
-      percentageFee: { type: Number, default: 0 },
-      distance: { type: Number, default: 0 }
+      platformFee: platformFee,
+      percentageFee: percentageFee,
+      distance: distance
     });
 
     const createdBooking = await booking.save();

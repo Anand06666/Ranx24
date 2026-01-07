@@ -312,6 +312,13 @@ const BookingDetailScreen = ({ navigation, route }: any) => {
                         <Text style={[styles.billValue, { color: colors.text }]}>₹{booking.price}</Text>
                     </View>
 
+                    {booking.platformFee > 0 && (
+                        <View style={styles.billRow}>
+                            <Text style={[styles.billLabel, { color: colors.textSecondary }]}>Platform Fee</Text>
+                            <Text style={[styles.billValue, { color: colors.text }]}>+₹{booking.platformFee}</Text>
+                        </View>
+                    )}
+
                     {booking.couponDiscount > 0 && (
                         <View style={styles.billRow}>
                             <Text style={[styles.billLabel, { color: '#10B981' }]}>Coupon Discount</Text>

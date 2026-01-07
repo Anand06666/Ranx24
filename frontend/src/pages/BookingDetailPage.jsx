@@ -238,8 +238,18 @@ export default function BookingDetailPage() {
 
               <div className="pt-2 border-t border-gray-100 mt-2">
                 <p className="flex items-center gap-3 text-gray-700">
+                  <FaRupeeSign className="text-gray-400" />
+                  <span>Base Price: <span className="font-semibold">₹{booking.price.toLocaleString()}</span></span>
+                </p>
+                {booking.platformFee > 0 && (
+                  <p className="flex items-center gap-3 text-gray-700 mt-1">
+                    <FaRupeeSign className="text-gray-400" />
+                    <span>Platform Fee: <span className="font-semibold text-orange-600">+₹{booking.platformFee.toLocaleString()}</span></span>
+                  </p>
+                )}
+                <p className="flex items-center gap-3 text-gray-700 mt-2 pt-2 border-t border-dashed border-gray-200">
                   <FaRupeeSign className="text-green-600" />
-                  <span>Total Price: <span className="font-bold text-xl">₹{booking.price.toLocaleString()}</span></span>
+                  <span>Total Amount: <span className="font-bold text-xl">₹{booking.finalPrice?.toLocaleString() || booking.price.toLocaleString()}</span></span>
                 </p>
               </div>
 

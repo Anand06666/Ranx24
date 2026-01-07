@@ -51,6 +51,7 @@ export interface Booking {
         name: string;
         phone?: string;
         mobileNumber?: string;
+        email?: string;
     };
     worker: string;
     service: string | {
@@ -73,6 +74,11 @@ export interface Booking {
     finalPrice: number;
     price: number;
     paymentStatus: 'pending' | 'paid' | 'refunded';
+    inspectionDetails?: { description: string; price: number }[];
+    inspectionTotal?: number;
+    finalAmountToPay?: number;
+    inspectionPaymentStatus?: 'pending' | 'paid' | 'failed';
+    inspectionPaymentMethod?: 'cash' | 'online';
     createdAt: string;
 }
 
