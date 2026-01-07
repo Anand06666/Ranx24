@@ -209,7 +209,7 @@ const WorkerDashboardScreen = ({ navigation }: any) => {
 
                     <TouchableOpacity
                         style={[styles.detailsBtn, { borderColor: colors.border }]}
-                        onPress={() => navigation.navigate('BookingDetails', { bookingId: item._id })}
+                        onPress={() => navigation.navigate('WorkerBookingDetail', { bookingId: item._id })}
                     >
                         <Text style={[styles.detailsBtnText, { color: colors.text }]}>View Details</Text>
                     </TouchableOpacity>

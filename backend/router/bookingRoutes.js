@@ -19,6 +19,8 @@ import {
   requestStartOtp,
   assignWorker,
   cancelBooking,
+  updateInspectionDetails,
+  verifyInspectionPayment,
 } from '../controller/bookingController.js';
 
 import { protect, admin, staff } from '../middleware/authMiddleware.js';
@@ -50,5 +52,7 @@ router.put('/:id/work-proof', protectWorker, uploadWorkProof);
 router.put('/:id/payment', protectWorker, collectPayment);
 router.put('/:id/verify-payment', protectWorker, verifyPaymentStatus);
 router.put('/:id/request-completion-otp', protectWorker, requestCompletionOtp);
+router.put('/:id/inspection', protectWorker, updateInspectionDetails);
+router.put('/:id/inspection-payment', protectWorker, verifyInspectionPayment);
 
 export default router;

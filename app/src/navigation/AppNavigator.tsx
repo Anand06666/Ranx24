@@ -43,6 +43,7 @@ import FAQScreen from '../screens/user/FAQScreen';
 
 // Worker Screens
 import WorkerDashboardScreen from '../screens/worker/WorkerDashboardScreen';
+import WorkerBookingDetailScreen from '../screens/worker/WorkerBookingDetailScreen';
 import WorkerProfileScreen from '../screens/user/WorkerProfileScreen';
 
 import { useAuth } from '../context/AuthContext';
@@ -134,7 +135,10 @@ const AppNavigator: React.FC = () => {
                     </>
                 ) : user?.role === 'worker' ? (
                     // Worker Stack
-                    <Stack.Screen name="WorkerDashboard" component={WorkerDashboardScreen} />
+                    <>
+                        <Stack.Screen name="WorkerDashboard" component={WorkerDashboardScreen} />
+                        <Stack.Screen name="WorkerBookingDetail" component={WorkerBookingDetailScreen} />
+                    </>
                 ) : (
                     // User Stack
                     <>

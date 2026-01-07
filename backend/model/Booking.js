@@ -141,6 +141,29 @@ const BookingSchema = mongoose.Schema(
     paymentLink: {
       type: String,
     },
+    // Inspection / Extra Work Details
+    inspectionDetails: [{
+      description: { type: String, required: true },
+      price: { type: Number, required: true }
+    }],
+    inspectionTotal: {
+      type: Number,
+      default: 0
+    },
+    // Total Amount to be paid (Original Price + Inspection Total - Discounts)
+    finalAmountToPay: {
+      type: Number,
+      // default: 0 // Calculated dynamically usually
+    },
+    inspectionPaymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending'
+    },
+    inspectionPaymentMethod: {
+      type: String,
+      enum: ['cash', 'online'],
+    },
     // For YC Coins reward tracking
     ycCoinsEarned: {
       type: Number,

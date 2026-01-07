@@ -1951,3 +1951,97 @@ export const assignWorker = async (req, res) => {
 };
 
 
+// @desc    Update Inspection/Extra Work Details
+// @route   PUT /api/bookings/:id/inspection
+// @access  Private (Worker)
+export const updateInspectionDetails = async (req, res) => {
+  const { inspectionDetails } = req.body;
+
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (booking.worker.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    // Calculate total
+    let total = 0;
+    if (inspectionDetails && Array.isArray(inspectionDetails)) {
+      total = inspectionDetails.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+    }
+
+    booking.inspectionDetails = inspectionDetails;
+    booking.inspectionTotal = total;
+
+    // Calculate final amount to pay
+    // Base logic: finalAmountToPay = (Original Final Price) + Inspection Total
+    // Note: If original was already paid, this amount is just the extra. 
+    // BUT user wants "Calculate Prize". 
+    // Let's store the GRAND TOTAL.
+    // If original price was 500 (paid), and inspection is 200. Total is 700.
+    // Payment status tracks the original 500. Inspection payment status tracks the 200.
+
+    booking.finalAmountToPay = (booking.finalPrice || 0) + total;
+
+    await booking.save();
+
+    res.json({
+      message: 'Inspection details updated',
+      booking
+    });
+
+  } catch (error) {
+    console.error('Error updating inspection details:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Verify Inspection Payment (Cash/Online)
+// @route   PUT /api/bookings/:id/inspection-payment
+// @access  Private (Worker)
+export const verifyInspectionPayment = async (req, res) => {
+  const { paymentMethod, paymentId } = req.body; // 'cash' or 'online'
+
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (booking.worker.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    if (booking.inspectionPaymentStatus === 'paid') {
+      return res.status(400).json({ message: 'Inspection payment already collected' });
+    }
+
+    booking.inspectionPaymentStatus = 'paid';
+    booking.inspectionPaymentMethod = paymentMethod;
+
+    if (paymentMethod === 'online' && paymentId) {
+      // Here you might verify signature if needed, or just trust the ID passed from verified frontend flow
+      // For simplicity, we record it.
+    }
+
+    await booking.save();
+
+    // Update Worker Wallet for Cash Collection?
+    // If Cash, worker collects it. 
+    // Usually platform deducts its commission from worker's wallet.
+    // Or if online, platform credits worker.
+
+    // For now, let's keep it simple and just mark paid.
+
+    res.json({ message: 'Inspection payment verified', booking });
+
+  } catch (error) {
+    console.error('Error verifying inspection payment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

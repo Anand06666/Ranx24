@@ -277,6 +277,53 @@ export default function BookingDetailPage() {
           </Card>
         </div>
 
+        {/* Inspection Details */}
+        {booking.inspectionDetails && booking.inspectionDetails.length > 0 && (
+          <Card className="mb-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">Inspection & Extra Charges</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-100 text-gray-500 text-sm">
+                    <th className="py-2">Description</th>
+                    <th className="py-2 text-right">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {booking.inspectionDetails.map((item, index) => (
+                    <tr key={index} className="border-b border-gray-50 last:border-0">
+                      <td className="py-3 text-gray-700">{item.description}</td>
+                      <td className="py-3 text-right font-medium">₹{item.price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-gray-50">
+                    <td className="py-3 font-bold text-gray-900">Total Extra Charges</td>
+                    <td className="py-3 text-right font-bold text-gray-900">₹{booking.inspectionTotal}</td>
+                  </tr>
+                  <tr>
+                    <td className="py-3 font-bold text-gray-900">Final Amount to Pay</td>
+                    <td className="py-3 text-right font-bold text-blue-600 text-lg">₹{booking.finalAmountToPay || (booking.price + booking.inspectionTotal)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+              <span className="text-gray-600 font-medium">Inspection Payment Status:</span>
+              <Badge variant={booking.inspectionPaymentStatus === 'paid' ? 'success' : 'warning'}>
+                {booking.inspectionPaymentStatus ? booking.inspectionPaymentStatus.toUpperCase() : 'PENDING'}
+              </Badge>
+            </div>
+            {booking.inspectionPaymentStatus === 'paid' && (
+              <p className="text-sm text-green-600 mt-2 flex items-center gap-2">
+                <FaCheckCircle /> Paid via {booking.inspectionPaymentMethod?.toUpperCase()}
+              </p>
+            )}
+          </Card>
+        )}
+
         {/* Date & Location */}
         <Card className="mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100">Date & Location</h2>
