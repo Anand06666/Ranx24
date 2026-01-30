@@ -63,7 +63,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-start gap-3">
                                 <LucideMapPin size={18} className="text-blue-500 mt-0.5" />
-                                <span>Patahi,Muzaffarpur,Bihar 843113</span>
+                                <span>Shubhankarpur,Patahi,Muzaffarpur,Bihar 843113</span>
                             </li>
                         </ul>
                     </div>
