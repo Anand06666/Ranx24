@@ -84,8 +84,8 @@ const ContactPage = () => {
                                 <div>
                                     <h3 className="font-semibold text-lg mb-1">Office</h3>
                                     <p className="text-blue-100">
-                                        Patahi, Muzaffarpur,<br />
-                                        Prayagraj, Bihar,<br />
+                                       Shubhankarpur Patahi, Muzaffarpur,<br />
+                                        Bihar,
                                         India - 833113
                                     </p>
                                 </div>
