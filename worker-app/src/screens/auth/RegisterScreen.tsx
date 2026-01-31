@@ -34,6 +34,7 @@ interface RegisterFormData {
     aadhaarNumber: string;
     panNumber: string;
     categories: string[];
+    services: string[]; // Added services
 }
 
 const RegisterScreen = ({ navigation }: any) => {
@@ -54,6 +55,7 @@ const RegisterScreen = ({ navigation }: any) => {
         aadhaarNumber: '',
         panNumber: '',
         categories: [],
+        services: [],
     });
 
     const [images, setImages] = useState<{
@@ -104,6 +106,14 @@ const RegisterScreen = ({ navigation }: any) => {
     const validateStep2 = () => {
         if (!formData.state || !formData.district || !formData.city) {
             Alert.alert('Missing Fields', 'Please fill all address fields');
+            return false;
+        }
+        if (!formData.categories || formData.categories.length === 0) {
+            Alert.alert('Missing Fields', 'Please select at least one category');
+            return false;
+        }
+        if (!formData.services || formData.services.length === 0) {
+            Alert.alert('Missing Fields', 'Please select at least one service');
             return false;
         }
         return true;
@@ -349,8 +359,22 @@ const RegisterScreen = ({ navigation }: any) => {
         const currentCats = formData.categories || [];
         if (currentCats.includes(catName)) {
             updateField('categories', currentCats.filter((c: string) => c !== catName));
+            // Also remove services belonging to this category? 
+            // For simplicity, we keep them or filter them out. 
+            // Ideally we should filter out services that no longer have their parent category selected.
+            // But since we store service names as strings, matching them back to category is tricky without lookup.
+            // For now, let's keep it simple.
         } else {
             updateField('categories', [...currentCats, catName]);
+        }
+    };
+
+    const toggleService = (serviceName: string) => {
+        const currentServices = formData.services || [];
+        if (currentServices.includes(serviceName)) {
+            updateField('services', currentServices.filter((s: string) => s !== serviceName));
+        } else {
+            updateField('services', [...currentServices, serviceName]);
         }
     };
 

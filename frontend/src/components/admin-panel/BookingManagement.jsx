@@ -107,10 +107,12 @@ const BookingManagement = () => {
           <thead className="sticky top-0 z-10 bg-blue-50 shadow">
             <tr>
               <th className="px-4 py-3 font-bold text-blue-700 text-left">Booking ID</th>
-              <th className="px-4 py-3 font-bold text-blue-700 text-left">User</th>
+              <th className="px-4 py-3 font-bold text-blue-700 text-left">User Details</th>
+              <th className="px-4 py-3 font-bold text-blue-700 text-left">Address</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-left">Service</th>
               {userRole !== 'employee' && <th className="px-4 py-3 font-bold text-blue-700 text-left">Amount</th>}
-              <th className="px-4 py-3 font-bold text-blue-700 text-left">Date</th>
+              <th className="px-4 py-3 font-bold text-blue-700 text-left">Service Date</th>
+              <th className="px-4 py-3 font-bold text-blue-700 text-left">Assigned Worker</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-center">Status</th>
               <th className="px-4 py-3 font-bold text-blue-700 text-center">Actions</th>
             </tr>
@@ -120,15 +122,51 @@ const BookingManagement = () => {
               <tr key={booking._id || booking.id} className="border-b border-gray-100 hover:bg-sky-50">
                 <td className="px-4 py-3 font-mono text-sm">#{booking._id?.slice(-6) || booking.id}</td>
                 <td className="px-4 py-3">
-                  {booking.user?.name ||
-                    (booking.user?.firstName ? `${booking.user.firstName} ${booking.user.lastName || ''}` : null) ||
-                    (typeof booking.user === 'string' ? booking.user : 'Unknown')}
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-gray-800">
+                      {booking.user?.name ||
+                        (booking.user?.firstName ? `${booking.user.firstName} ${booking.user.lastName || ''}` : null) ||
+                        (typeof booking.user === 'string' ? booking.user : 'Unknown')}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {booking.user?.mobileNumber || booking.user?.phone || 'N/A'}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-sm max-w-[200px]">
+                  {typeof booking.address === 'object' ? (
+                    <div className="flex flex-col">
+                      <span>{booking.address.street || booking.address.line1 || ''}</span>
+                      <span className="text-xs text-gray-500">
+                        {booking.address.city || ''} {booking.address.zipCode || booking.address.pincode || ''}
+                      </span>
+                    </div>
+                  ) : (
+                    booking.address || 'N/A'
+                  )}
                 </td>
                 <td className="px-4 py-3">{booking.service}</td>
                 {userRole !== 'employee' && (
                   <td className="px-4 py-3 font-semibold">₹{(booking.finalPrice || booking.totalPrice || 0).toLocaleString('en-IN')}</td>
                 )}
-                <td className="px-4 py-3">{new Date(booking.bookingDate || booking.createdAt).toLocaleDateString()}</td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-col">
+                    <span>{new Date(booking.bookingDate).toLocaleDateString()}</span>
+                    <span className="text-xs text-gray-500">{booking.bookingTime}</span>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  {booking.worker ? (
+                    <div className="flex flex-col">
+                      <span className="font-medium text-blue-800">
+                        {booking.worker.firstName} {booking.worker.lastName}
+                      </span>
+                      <span className="text-xs text-gray-500">{booking.worker.mobileNumber}</span>
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 italic">Not Assigned</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
                     {booking.status}
@@ -140,29 +178,20 @@ const BookingManagement = () => {
                       onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
                       className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition"
                     >
-                      Assign Worker
+                      Assign
                     </button>
                   )}
                   {booking.status === 'assigned' && (
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs text-gray-500">
-                        Worker: {booking.worker?.name ||
-                          (booking.worker?.firstName ? `${booking.worker.firstName} ${booking.worker.lastName || ''}` : null) ||
-                          (typeof booking.worker === 'string' ? booking.worker : 'Assigned')}
-                      </span>
-                      <button
-                        onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
-                        className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600 transition"
-                      >
-                        Re-assign
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
+                      className="bg-orange-500 text-white px-3 py-1 rounded text-xs hover:bg-orange-600 transition"
+                    >
+                      Re-assign
+                    </button>
                   )}
                   {booking.status === 'rejected' && (
                     <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs text-red-500">
-                        Rejected by: {booking.worker?.name || 'Worker'}
-                      </span>
+                      <span className="text-xs text-red-500">Rejected</span>
                       <button
                         onClick={() => navigate(`/admin/bookings/${booking._id}/assign`)}
                         className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition"
@@ -175,7 +204,7 @@ const BookingManagement = () => {
               </tr>
             )) : (
               <tr>
-                <td colSpan="7" className="text-center py-8 text-gray-500">No bookings found for this filter.</td>
+                <td colSpan="9" className="text-center py-8 text-gray-500">No bookings found for this filter.</td>
               </tr>
             )}
           </tbody>

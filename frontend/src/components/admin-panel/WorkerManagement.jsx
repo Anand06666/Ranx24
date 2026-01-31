@@ -241,7 +241,7 @@ const WorkerManagement = () => {
         <table className="min-w-[1300px] w-full text-sm leading-relaxed">
           <thead className="sticky top-0 z-10 bg-blue-50 shadow">
             <tr>
-              <th className="px-3 py-3 font-bold text-blue-700 text-left">Sr. No.</th>
+              <th className="px-3 py-3 font-bold text-blue-700 text-left">Worker ID</th>
               <th className="px-3 py-3 font-bold text-blue-700 text-left">Name</th>
               <th className="px-3 py-3 font-bold text-blue-700 text-left">Number</th>
               <th className="px-3 py-3 font-bold text-blue-700 text-left">Services</th>
@@ -254,7 +254,7 @@ const WorkerManagement = () => {
           <tbody>
             {filteredWorkers.map((worker, index) => (
               <tr key={worker._id} className="border-b border-gray-100 hover:bg-sky-50">
-                <td className="px-3 py-3 font-mono">{index + 1}</td>
+                <td className="px-3 py-3 font-mono font-bold text-blue-600">#{worker._id?.slice(-6).toUpperCase()}</td>
                 <td className="px-3 py-3 font-semibold text-gray-700">{worker.firstName} {worker.lastName}</td>
                 <td className="px-3 py-3">{worker.mobileNumber}</td>
                 <td className="px-3 py-3">
